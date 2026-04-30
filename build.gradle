@@ -1,0 +1,101 @@
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "4.2.1"
+}
+
+version = "1.0.0"
+group = "com.ishm"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Micronaut Core
+    annotationProcessor("io.micronaut:micronaut-http-validation")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-http-server-netty")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut:micronaut-runtime")
+    implementation("io.micronaut.validation:micronaut-validation")
+
+    // Micronaut Security with JWT
+    implementation("io.micronaut.security:micronaut-security")
+    implementation("io.micronaut.security:micronaut-security-jwt")
+
+    // Database
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("org.postgresql:postgresql:42.7.1")
+
+    // Password Hashing
+    implementation("org.mindrot:jbcrypt:0.4")
+
+    // JSON Processing
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    // Logging
+    runtimeOnly("ch.qos.logback:logback-classic")
+    implementation("org.slf4j:slf4j-api")
+
+    // Monitoring & Metrics
+    implementation("io.micronaut.micrometer:micronaut-micrometer-core")
+    implementation("io.micronaut.micrometer:micronaut-micrometer-registry-prometheus")
+
+    // YAML Configuration
+    runtimeOnly("org.yaml:snakeyaml")
+
+    // Testing
+    testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation("io.micronaut.test:micronaut-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.mockito:mockito-core")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+}
+
+application {
+    mainClass.set("com.ishm.soil.Application")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+micronaut {
+    runtime("netty")
+    testRuntime("junit5")
+    processing {
+        incremental(true)
+        annotations("com.ishm.*")
+    }
+}
+
+tasks {
+    dockerBuild {
+        images = ["soil-health-monitor:$project.version"]
+    }
+
+    dockerBuildNative {
+        images = ["soil-health-monitor:$project.version-native"]
+    }
+}
+
+// Shadow JAR configuration
+shadowJar {
+    archiveBaseName.set('soil-health-monitor')
+    archiveClassifier.set('')
+    archiveVersion.set(project.version.toString())
+    mergeServiceFiles()
+}
+
+// Test configuration
+test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        exceptionFormat = "full"
+    }
+}
