@@ -421,6 +421,19 @@ java $JAVA_OPTS -jar app.jar
 docker stats soil-health-app
 ```
 
+### Database Performance
+
+If spatial queries are slow, ensure GiST indexes are properly created:
+
+```sql
+-- Check for geometry indexes
+SELECT * FROM pg_indexes WHERE tablename = 'districts' AND indexname LIKE '%gist%';
+
+-- Force analyze to update statistics
+ANALYZE districts;
+ANALYZE soil_tests;
+```
+
 ### Performance Tuning
 
 ```bash
