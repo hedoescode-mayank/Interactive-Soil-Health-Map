@@ -253,7 +253,8 @@ public class AuthController {
 
     /**
      * Hash password using SHA-256
-     * NOTE: For production, use BCrypt instead
+     * NOTE: For production, use BCrypt or Argon2 instead.
+     * SHA-256 is used here for simplicity in this educational project.
      */
     private String hashPassword(String password) {
         try {
