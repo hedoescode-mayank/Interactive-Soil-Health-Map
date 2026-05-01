@@ -19,3 +19,4 @@ out/
 bin/
 .vscode/
 node_modules/
+li*.txt
