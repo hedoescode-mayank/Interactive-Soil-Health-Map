@@ -20,6 +20,15 @@ A production-ready, full-stack application for soil health monitoring and analys
 - Production-ready configuration
 - Docker support
 
+## 🏗️ Architecture
+
+The system follows a modern, decoupled architecture:
+
+- **Backend**: Built with Micronaut 4.x (Java), providing a lightweight, high-performance REST API.
+- **Frontend**: Responsive Single Page Application (SPA) utilizing modern JavaScript and Leaflet for mapping.
+- **Database**: PostgreSQL with PostGIS for robust spatial data handling and efficient nutrient analysis.
+- **Security**: Stateless JWT-based authentication ensuring secure access across all endpoints.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
