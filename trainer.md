@@ -44,6 +44,11 @@ Located in `schema/schema.sql`.
 - **Views**: We use `vw_district_soil_stats` to pre-calculate averages so the API stays fast.
 - **PostGIS**: Stores `geom` data as `MultiPolygon`.
 
+### 🔐 Security & Authentication
+- **Stateless**: We use JWT (JSON Web Tokens) so the server doesn't need to track sessions.
+- **Payload**: The token carries the `farmer_id` and `username` encrypted in its payload.
+- **Interceptors**: Micronaut Security intercepts requests to `/api/dashboard/*` and `/api/recommendations/*` to ensure only logged-in users can access them.
+
 ---
 
 ## 4. How the Database is Connected
