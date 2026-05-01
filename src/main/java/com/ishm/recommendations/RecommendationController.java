@@ -73,8 +73,9 @@ public class RecommendationController {
             return HttpResponse.ok(recommendations);
 
         } catch (Exception e) {
-            LOG.error("Error calculating recommendations", e);
-            return HttpResponse.serverError(Map.of("error", "Failed to calculate recommendations"));
+            LOG.error("Error calculating recommendations for crop: {}", request.getCrop(), e);
+            String errorMsg = "Failed to calculate recommendations: " + (e.getMessage() != null ? e.getMessage() : "Unknown error");
+            return HttpResponse.serverError(Map.of("error", errorMsg));
         }
     }
 
