@@ -30,6 +30,7 @@ public class AuthController {
      */
     @Post("/register")
     public HttpResponse<Map<String, Object>> register(@Body RegistrationRequest request) {
+        LOG.info("Registration attempt for user: {}", request.getUsername());
         try {
             // Validate inputs
             if (request.getUsername() == null || request.getUsername().length() < 3) {
@@ -108,6 +109,7 @@ public class AuthController {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("message", "Registration successful! You can now login.");
+                LOG.info("Registration successful for user: {}", request.getUsername());
                 return HttpResponse.ok(response);
             }
 
@@ -122,6 +124,7 @@ public class AuthController {
      */
     @Post("/login")
     public HttpResponse<Map<String, Object>> login(@Body LoginRequest request) {
+        LOG.info("Login attempt for user: {}", request.getUsername());
         try {
             // Concept: Using View for simplified query
             String query = "SELECT * FROM vw_farmer_soil_data WHERE username = ?";
@@ -165,12 +168,14 @@ public class AuthController {
                                     "fullName", rs.getString("full_name")
                             ));
 
+                            LOG.info("User {} logged in successfully", username);
                             return HttpResponse.ok(response);
                         }
                     }
                 }
             }
 
+            LOG.warn("Login failed for user: {}", request.getUsername());
             return HttpResponse.unauthorized().body(Map.of("error", "Invalid username or password"));
 
         } catch (SQLException e) {
