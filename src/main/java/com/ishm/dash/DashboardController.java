@@ -57,7 +57,12 @@ public class DashboardController {
     }
 
     /**
-     * Get key performance metrics
+     * Get key performance metrics including districts covered and total samples.
+     * 
+     * @param state Optional state filter
+     * @param year Target year for metrics
+     * @return Map of metric values
+     * @throws SQLException if database error occurs
      */
     private Map<String, Object> getKeyMetrics(Optional<String> state, int year) throws SQLException {
         Map<String, Object> metrics = new HashMap<>();
@@ -88,7 +93,13 @@ public class DashboardController {
     }
 
     /**
-     * Get NPK trends over months
+     * Get NPK (Nitrogen, Phosphorus, Potassium) trends over months.
+     * Currently utilizes randomized demo data for visualization.
+     * 
+     * @param state Optional state filter
+     * @param year Target year for trends
+     * @return Map containing month labels and NPK data points
+     * @throws SQLException if database error occurs
      */
     private Map<String, Object> getNPKTrends(Optional<String> state, int year) throws SQLException {
         Map<String, Object> trends = new HashMap<>();
@@ -114,7 +125,12 @@ public class DashboardController {
     }
 
     /**
-     * Get state-wise sample distribution
+     * Get state-wise sample distribution across the country.
+     * Aggregates sample counts and average nitrogen levels per state.
+     * 
+     * @param year Target year for distribution
+     * @return List of state data maps
+     * @throws SQLException if database error occurs
      */
     private List<Map<String, Object>> getStateDistribution(int year) throws SQLException {
         List<Map<String, Object>> distribution = new ArrayList<>();
@@ -149,7 +165,13 @@ public class DashboardController {
     }
 
     /**
-     * Get district-wise summary for table
+     * Get district-wise summary for dashboard table display.
+     * Includes NPK status and basic soil parameters.
+     * 
+     * @param state Optional state filter
+     * @param year Target year for summary
+     * @return List of district summary maps
+     * @throws SQLException if database error occurs
      */
     private List<Map<String, Object>> getDistrictSummary(Optional<String> state, int year) throws SQLException {
         List<Map<String, Object>> districtsList = new ArrayList<>();
