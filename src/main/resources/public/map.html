@@ -277,6 +277,82 @@
                 height: 60vh !important;
             }
         }
+
+        /* Search Box */
+        .search-container {
+            padding: 16px 24px;
+            background: var(--bg-light);
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-light);
+        }
+
+        /* Layer Controls */
+        .map-layer-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .layer-btn {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: var(--transition);
+        }
+
+        .layer-btn:hover {
+            background: var(--bg-light);
+            transform: scale(1.1);
+        }
+
+        .layer-btn.active {
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* Popup Enhancements */
+        .popup-chart-container {
+            margin-top: 12px;
+            height: 100px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -312,6 +388,13 @@
             <div class="sidebar-header">
                 <h2>Map Controls</h2>
                 <p style="opacity: 0.9; font-size: 14px;">Select nutrient to visualize</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="districtSearch" class="search-input" placeholder="Search District...">
+                </div>
             </div>
 
             <div class="sidebar-section">
@@ -420,9 +503,16 @@
         </aside>
 
         <div id="map"></div>
+        <div class="map-layer-controls">
+            <button class="layer-btn active" id="layerStandard" title="Standard View">🗺️</button>
+            <button class="layer-btn" id="layerSatellite" title="Satellite View">🛰️</button>
+            <button class="layer-btn" id="layerTerrain" title="Terrain View">⛰️</button>
+            <button class="layer-btn" id="btnCenterMap" title="Reset View">📍</button>
+        </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     let map, districtLayer;
@@ -443,7 +533,70 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
+        setupLayerControls();
+        setupSearch();
         loadMapData();
+    }
+
+    function setupLayerControls() {
+        const layers = {
+            standard: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
+            terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')
+        };
+
+        const btns = {
+            standard: document.getElementById('layerStandard'),
+            satellite: document.getElementById('layerSatellite'),
+            terrain: document.getElementById('layerTerrain')
+        };
+
+        Object.keys(btns).forEach(key => {
+            btns[key].addEventListener('click', () => {
+                Object.values(layers).forEach(l => map.removeLayer(l));
+                layers[key].addTo(map);
+                Object.values(btns).forEach(b => b.classList.remove('active'));
+                btns[key].classList.add('active');
+            });
+        });
+
+        document.getElementById('btnCenterMap').addEventListener('click', () => {
+            map.setView([23.5937, 78.9629], 5);
+        });
+    }
+
+    function setupSearch() {
+        const searchInput = document.getElementById('districtSearch');
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            if (!term) return;
+
+            if (districtLayer) {
+                districtLayer.eachLayer(layer => {
+                    const name = layer.feature.properties.district_name.toLowerCase();
+                    if (name.includes(term)) {
+                        layer.setStyle({ color: '#ff0000', weight: 4 });
+                    } else {
+                        districtLayer.resetStyle(layer);
+                    }
+                });
+            }
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const term = e.target.value.toLowerCase();
+                if (districtLayer) {
+                    districtLayer.eachLayer(layer => {
+                        const name = layer.feature.properties.district_name.toLowerCase();
+                        if (name.includes(term)) {
+                            map.fitBounds(layer.getBounds());
+                            layer.openPopup();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     // Color based on nutrient status
@@ -544,27 +697,18 @@
                         const popupContent = `
                             <div class="popup-title">${props.district_name}, ${props.state_name}</div>
                             <div class="popup-row">
-                                <strong>Nitrogen:</strong>
-                                <span>${props.nitrogen_avg} kg/ha (${props.nitrogen_status})</span>
-                            </div>
-                            <div class="popup-row">
-                                <strong>Phosphorus:</strong>
-                                <span>${props.phosphorus_avg} kg/ha (${props.phosphorus_status})</span>
-                            </div>
-                            <div class="popup-row">
-                                <strong>Potassium:</strong>
-                                <span>${props.potassium_avg} kg/ha (${props.potassium_status})</span>
-                            </div>
-                            <div class="popup-row">
-                                <strong>pH:</strong>
-                                <span>${props.ph_avg}</span>
-                            </div>
-                            <div class="popup-row">
                                 <strong>Samples:</strong>
                                 <span>${props.samples_analyzed.toLocaleString('en-IN')}</span>
                             </div>
+                            <div class="popup-chart-container">
+                                <canvas id="popupChart-${props.district_name.replace(/\s+/g, '-')}"></canvas>
+                            </div>
                         `;
-                        layer.bindPopup(popupContent);
+                        layer.bindPopup(popupContent, { maxWidth: 300 });
+
+                        layer.on('popupopen', () => {
+                            setTimeout(() => renderPopupChart(props), 100);
+                        });
                     }
                 }).addTo(map);
             } else {
@@ -575,6 +719,33 @@
             console.error('Error loading map data:', error);
             loadDemoData();
         }
+    }
+
+    function renderPopupChart(props) {
+        const ctx = document.getElementById(`popupChart-${props.district_name.replace(/\s+/g, '-')}`);
+        if (!ctx) return;
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['N', 'P', 'K'],
+                datasets: [{
+                    label: 'Nutrient Levels (kg/ha)',
+                    data: [props.nitrogen_avg, props.phosphorus_avg, props.potassium_avg],
+                    backgroundColor: ['#3498db', '#9b59b6', '#e67e22'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
     }
 
     // Demo data fallback
