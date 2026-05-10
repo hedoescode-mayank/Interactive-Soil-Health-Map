@@ -42,129 +42,109 @@
         </div>
 
         <div class="form-container">
+            <div class="wizard-progress">
+                <div class="step active" id="step1-indicator">1. Location</div>
+                <div class="step" id="step2-indicator">2. Soil Test</div>
+                <div class="step" id="step3-indicator">3. Crop</div>
+            </div>
+
             <form id="recommendationForm">
-                <!-- Location Section -->
-                <div class="form-section">
-                    <h3>Location Information</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="state">State *</label>
-                            <select id="state" name="state" required>
-                                <option value="">Select State</option>
-                                <option value="Delhi">Delhi</option>
-                                <option value="Haryana">Haryana</option>
-                                <option value="Punjab">Punjab</option>
-                                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                <option value="Maharashtra">Maharashtra</option>
-                                <option value="Rajasthan">Rajasthan</option>
-                                <option value="Gujarat">Gujarat</option>
-                                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                                <option value="Karnataka">Karnataka</option>
-                                <option value="Tamil Nadu">Tamil Nadu</option>
-                            </select>
+                <!-- Step 1: Location -->
+                <div class="wizard-step active" id="step1">
+                    <div class="form-section">
+                        <h3>Location Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <select id="state" name="state" required>
+                                    <option value="">Select State</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Haryana">Haryana</option>
+                                    <option value="Punjab">Punjab</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="district">District *</label>
+                                <input type="text" id="district" name="district" placeholder="Start typing district name..." list="districts" required autocomplete="off">
+                                <datalist id="districts"></datalist>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="district">District *</label>
-                            <input type="text" id="district" name="district" placeholder="Start typing district name..." list="districts" required autocomplete="off">
-                            <datalist id="districts"></datalist>
-                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next: Soil Data</button>
                     </div>
                 </div>
 
-                <!-- Soil Test Values Section -->
-                <div class="form-section">
-                    <h3>Soil Test Results</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="nitrogen">
-                                Nitrogen (N)
-                                <span class="unit">kg/ha</span>
-                            </label>
-                            <input type="number" id="nitrogen" name="nitrogen" placeholder="e.g., 250" step="0.1">
-                            <span class="input-hint">Leave blank if unknown</span>
+                <!-- Step 2: Soil Data -->
+                <div class="wizard-step" id="step2" style="display: none;">
+                    <div class="form-section">
+                        <h3>Soil Test Results</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nitrogen">Nitrogen (N) <span class="unit">kg/ha</span></label>
+                                <input type="number" id="nitrogen" name="nitrogen" placeholder="e.g., 250" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="phosphorus">Phosphorus (P) <span class="unit">kg/ha</span></label>
+                                <input type="number" id="phosphorus" name="phosphorus" placeholder="e.g., 20" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="potassium">Potassium (K) <span class="unit">kg/ha</span></label>
+                                <input type="number" id="potassium" name="potassium" placeholder="e.g., 180" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label for="ph">pH Level</label>
+                                <input type="number" id="ph" name="ph" placeholder="e.g., 7.2" step="0.1" min="0" max="14">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="phosphorus">
-                                Phosphorus (P)
-                                <span class="unit">kg/ha</span>
-                            </label>
-                            <input type="number" id="phosphorus" name="phosphorus" placeholder="e.g., 20" step="0.1">
-                            <span class="input-hint">Leave blank if unknown</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="potassium">
-                                Potassium (K)
-                                <span class="unit">kg/ha</span>
-                            </label>
-                            <input type="number" id="potassium" name="potassium" placeholder="e.g., 180" step="0.1">
-                            <span class="input-hint">Leave blank if unknown</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="ph">
-                                pH Level
-                            </label>
-                            <input type="number" id="ph" name="ph" placeholder="e.g., 7.2" step="0.1" min="0" max="14">
-                        </div>
-                        <div class="form-group">
-                            <label for="organic_carbon">
-                                Organic Carbon
-                                <span class="unit">%</span>
-                            </label>
-                            <input type="number" id="organic_carbon" name="organic_carbon" placeholder="e.g., 0.5" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="ec">
-                                Electrical Conductivity
-                                <span class="unit">dS/m</span>
-                            </label>
-                            <input type="number" id="ec" name="ec" placeholder="e.g., 0.8" step="0.01">
-                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="nextStep(1)">Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next: Crop Details</button>
                     </div>
                 </div>
 
-                <!-- Crop Selection Section -->
-                <div class="form-section">
-                    <h3>Crop Information</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="crop">Select Crop *</label>
-                            <select id="crop" name="crop" required>
-                                <option value="">Select Crop</option>
-                                <optgroup label="Cereals">
-                                    <option value="wheat">Wheat</option>
-                                    <option value="rice">Rice (Paddy)</option>
-                                    <option value="maize">Maize</option>
-                                </optgroup>
-                                <optgroup label="Cash Crops">
-                                    <option value="cotton">Cotton</option>
-                                    <option value="sugarcane">Sugarcane</option>
-                                </optgroup>
-                                <optgroup label="Oilseeds">
-                                    <option value="mustard">Mustard</option>
-                                    <option value="groundnut">Groundnut</option>
-                                </optgroup>
-                                <optgroup label="Vegetables">
-                                    <option value="tomato">Tomato</option>
-                                    <option value="potato">Potato</option>
-                                    <option value="onion">Onion</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="season">Cropping Season *</label>
-                            <select id="season" name="season" required>
-                                <option value="">Select Season</option>
-                                <option value="kharif">Kharif (June-October)</option>
-                                <option value="rabi">Rabi (October-March)</option>
-                                <option value="zaid">Zaid (April-June)</option>
-                            </select>
+                <!-- Step 3: Crop Details -->
+                <div class="wizard-step" id="step3" style="display: none;">
+                    <div class="form-section">
+                        <h3>Crop Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="crop">Select Crop *</label>
+                                <select id="crop" name="crop" required>
+                                    <option value="">Select Crop</option>
+                                    <optgroup label="Cereals">
+                                        <option value="wheat">Wheat</option>
+                                        <option value="rice">Rice (Paddy)</option>
+                                        <option value="maize">Maize</option>
+                                    </optgroup>
+                                    <optgroup label="Cash Crops">
+                                        <option value="cotton">Cotton</option>
+                                        <option value="sugarcane">Sugarcane</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="season">Cropping Season *</label>
+                                <select id="season" name="season" required>
+                                    <option value="">Select Season</option>
+                                    <option value="kharif">Kharif</option>
+                                    <option value="rabi">Rabi</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-                    <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="nextStep(2)">Back</button>
+                        <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -174,23 +154,25 @@
             <h2>Fertilizer Recommendations</h2>
 
             <div class="results-grid">
-                <!-- Nutrient Status Cards -->
-                <div class="status-card">
-                    <h4>Soil Nutrient Status</h4>
-                    <div class="nutrient-status-grid">
-                        <div class="nutrient-status-item">
-                            <span class="nutrient-label">Nitrogen</span>
-                            <span class="status-badge" id="n-status">-</span>
-                        </div>
-                        <div class="nutrient-status-item">
-                            <span class="nutrient-label">Phosphorus</span>
-                            <span class="status-badge" id="p-status">-</span>
-                        </div>
-                        <div class="nutrient-status-item">
-                            <span class="nutrient-label">Potassium</span>
-                            <span class="status-badge" id="k-status">-</span>
-                        </div>
+                <!-- Soil Analysis Radar Chart -->
+                <div class="status-card chart-card">
+                    <h4>Soil Health Analysis</h4>
+                    <div class="radar-container">
+                        <canvas id="soilRadarChart"></canvas>
                     </div>
+                </div>
+
+                <!-- Sustainability Score -->
+                <div class="status-card score-card">
+                    <h4>Sustainability Score</h4>
+                    <div class="score-circle">
+                        <svg viewBox="0 0 36 36" class="circular-chart">
+                            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path class="circle" id="scoreCircle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <text x="18" y="20.35" class="percentage" id="scoreText">0%</text>
+                        </svg>
+                    </div>
+                    <p id="sustainabilityLabel" style="text-align: center; margin-top: 10px; font-weight: 600;">Calculating...</p>
                 </div>
 
                 <!-- Recommended Fertilizers -->
@@ -369,15 +351,45 @@
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
 
+            // Loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Analyzing Soil...';
+            submitBtn.disabled = true;
+
             // Fake API fetch simulation
-            console.log('Fetching soil data from API for state:', data.state, 'district:', data.district);
-            // Simulate delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log('API response received. Processing recommendations...');
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
 
             displayDemoRecommendations(data);
         });
     });
+
+    function nextStep(step) {
+        // Validation for previous step
+        if (step > 1) {
+            const prevStep = step - 1;
+            const inputs = document.querySelectorAll(`#step${prevStep} [required]`);
+            for (let input of inputs) {
+                if (!input.value) {
+                    alert('Please fill all required fields');
+                    return;
+                }
+            }
+        }
+
+        // Switch steps
+        document.querySelectorAll('.wizard-step').forEach(s => s.style.display = 'none');
+        document.getElementById('step' + step).style.display = 'block';
+
+        // Update indicators
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        for (let i = 1; i <= step; i++) {
+            document.getElementById(`step${i}-indicator`).classList.add('active');
+        }
+    }
 
     function populateDistricts(state) {
         const datalist = document.getElementById('districts');
@@ -409,9 +421,11 @@
     function displayRecommendations(data) {
         document.getElementById('resultsSection').style.display = 'block';
 
-        updateNutrientStatus('n-status', data.nitrogenStatus);
-        updateNutrientStatus('p-status', data.phosphorusStatus);
-        updateNutrientStatus('k-status', data.potassiumStatus);
+        // Update Radar Chart
+        renderRadarChart(data);
+
+        // Update Sustainability Score
+        updateSustainabilityScore(data);
 
         document.getElementById('urea-dose').textContent = `${data.ureaDose} kg/ha`;
         document.getElementById('dap-dose').textContent = `${data.dapDose} kg/ha`;
@@ -423,11 +437,95 @@
         document.getElementById('second-topdress').textContent = generateSecondTopdress(crop);
 
         // Update tips
-        const tips = generateTips(data.nitrogenStatus, data.phosphorusStatus, data.kStatus, crop);
+        const tips = generateTips(data.nitrogenStatus, data.phosphorusStatus, data.potassiumStatus, crop);
         const tipsList = document.getElementById('additional-tips');
         tipsList.innerHTML = tips.map(tip => `<li>${tip}</li>`).join('');
 
         document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    let radarChart = null;
+    function renderRadarChart(data) {
+        const ctx = document.getElementById('soilRadarChart');
+        if (radarChart) radarChart.destroy();
+
+        // Normalized values for visualization (0-100 scale)
+        const current = [
+            Math.min(100, (data.n / 560) * 100),
+            Math.min(100, (data.p / 25) * 100),
+            Math.min(100, (data.k / 280) * 100)
+        ];
+        
+        const ideal = [80, 80, 80]; // Target levels
+
+        radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Nitrogen (N)', 'Phosphorus (P)', 'Potassium (K)'],
+                datasets: [{
+                    label: 'Current Soil Status',
+                    data: current,
+                    fill: true,
+                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    borderColor: 'rgb(39, 174, 96)',
+                    pointBackgroundColor: 'rgb(39, 174, 96)',
+                    pointBorderColor: '#fff'
+                }, {
+                    label: 'Ideal Requirement',
+                    data: ideal,
+                    fill: true,
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderColor: 'rgba(52, 152, 219, 0.5)',
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                elements: { line: { borderWidth: 3 } },
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateSustainabilityScore(data) {
+        // Calculate score based on balance
+        let score = 0;
+        if (data.nitrogenStatus === 'Medium') score += 33;
+        else if (data.nitrogenStatus === 'High') score += 20;
+        else score += 10;
+
+        if (data.phosphorusStatus === 'Medium') score += 33;
+        else if (data.phosphorusStatus === 'High') score += 20;
+        else score += 10;
+
+        if (data.potassiumStatus === 'Medium') score += 34;
+        else if (data.potassiumStatus === 'High') score += 20;
+        else score += 10;
+
+        const circle = document.getElementById('scoreCircle');
+        const text = document.getElementById('scoreText');
+        const label = document.getElementById('sustainabilityLabel');
+
+        circle.style.strokeDasharray = `${score}, 100`;
+        text.textContent = `${score}%`;
+
+        if (score > 80) {
+            label.textContent = 'Excellent Sustainability';
+            label.style.color = '#27ae60';
+        } else if (score > 50) {
+            label.textContent = 'Good Balance';
+            label.style.color = '#f39c12';
+        } else {
+            label.textContent = 'Needs Improvement';
+            label.style.color = '#e74c3c';
+        }
     }
 
     function displayDemoRecommendations(formData) {
@@ -445,7 +543,10 @@
             ureaDose: calculateUreaDose(n, cropReq.nitrogenReq),
             dapDose: calculateDAPDose(p, cropReq.phosphorusReq),
             mopDose: calculateMOPDose(k, cropReq.potassiumReq),
-            crop: crop
+            crop: crop,
+            n: n,
+            p: p,
+            k: k
         };
 
         displayRecommendations(recommendations);
@@ -567,8 +668,10 @@
         document.getElementById('recommendationForm').reset();
         document.getElementById('districts').innerHTML = '';
         document.getElementById('resultsSection').style.display = 'none';
+        nextStep(1);
     }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </body>
 </html>
