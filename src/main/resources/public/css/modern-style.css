@@ -29,6 +29,23 @@
     --radius-xl: 24px;
 
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --header-height: 80px;
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+    --bg-white: #1a1a1a;
+    --bg-light: #121212;
+    --text-primary: #f8f9fa;
+    --text-secondary: #bdc3c7;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.5);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.6);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.7);
+    --header-bg: rgba(26, 26, 26, 0.95);
+}
+
+[data-theme="light"] {
+    --header-bg: rgba(255, 255, 255, 0.95);
 }
 
 * {
@@ -60,11 +77,62 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(255,255,255,0.95);
+    background: var(--header-bg);
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-sm);
     z-index: 1000;
     transition: var(--transition);
+}
+
+.news-ticker {
+    background: var(--primary-dark);
+    color: white;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.ticker-content {
+    display: inline-block;
+    padding-left: 100%;
+    animation: ticker 30s linear infinite;
+}
+
+@keyframes ticker {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-primary);
 }
 
 .header-content {
@@ -137,6 +205,34 @@ body {
 .auth-buttons {
     display: flex;
     gap: 12px;
+    align-items: center;
+}
+
+@media (max-width: 992px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .nav {
+        position: fixed;
+        top: var(--header-height);
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - var(--header-height));
+        background: var(--bg-white);
+        flex-direction: column;
+        padding: 40px;
+        transition: var(--transition);
+        z-index: 999;
+    }
+
+    .nav.active {
+        left: 0;
+    }
+
+    .nav-link {
+        font-size: 18px;
+    }
 }
 
 /* Buttons */

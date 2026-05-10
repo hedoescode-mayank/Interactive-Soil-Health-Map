@@ -10,6 +10,12 @@
 </head>
 <body>
 
+<div class="news-ticker">
+    <div class="ticker-content">
+        🚀 New Features: Real-time Soil Health Tracking across 500+ districts | 🚜 Farmers can now get personalized Fertilizer Recommendations in 10+ languages | 📈 41.6 Lakh samples analyzed in 2025-26 | 🌟 Sustainable Agriculture is the future of India!
+    </div>
+</div>
+
 <header class="header">
     <div class="container">
         <div class="header-content">
@@ -27,8 +33,10 @@
                 <a href="dashboard.html" class="nav-link">Dashboard</a>
             </nav>
             <div class="auth-buttons">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌓</button>
                 <button onclick="showLogin()" class="btn-outline">Login</button>
                 <button onclick="showRegister()" class="btn-primary">Register</button>
+                <button class="mobile-menu-toggle" id="menuToggle">☰</button>
             </div>
         </div>
     </div>
@@ -376,8 +384,39 @@
             } else {
                 element.textContent = Math.floor(current).toLocaleString('en-IN');
             }
-        }, 20);
+        }, 16); // Smoother 60fps-ish
     }
+
+    // Theme Management
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        const toggleBtn = document.getElementById('themeToggle');
+        toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+    // Mobile Menu
+    const menuToggle = document.getElementById('menuToggle');
+    const nav = document.querySelector('.nav');
+
+    menuToggle.addEventListener('click', () => {
+        nav.classList.toggle('active');
+        menuToggle.textContent = nav.classList.contains('active') ? '✕' : '☰';
+    });
 
     // Initialize counters when visible
     const observerOptions = { threshold: 0.5 };
@@ -526,6 +565,7 @@
 
     // Simple AOS-like animation
     document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
         const animElements = document.querySelectorAll('[data-aos]');
         const animObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
