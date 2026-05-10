@@ -373,6 +373,9 @@
                 <a href="recommendations.html" class="nav-link">Get SHC</a>
                 <a href="dashboard.html" class="nav-link">Dashboard</a>
             </nav>
+            <div class="auth-buttons">
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌓</button>
+            </div>
         </div>
     </div>
 </header>
@@ -522,6 +525,7 @@
 
     // Initialize map
     function initMap() {
+        initTheme();
         map = L.map('map', {
             center: [23.5937, 78.9629],
             zoom: 5,
@@ -876,6 +880,28 @@
     // Initialize
     initMap();
     updateLegend();
+
+    // Theme Management
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 </script>
 
 </body>

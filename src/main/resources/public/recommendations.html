@@ -30,7 +30,10 @@
                 <li><a href="dashboard.html">Dashboard</a></li>
             </ul>
         </nav>
-        <a href="#" class="login-btn">Login</a>
+        <div class="auth-buttons" style="display: flex; gap: 1rem; align-items: center;">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme" style="background:none; border:none; cursor:pointer; font-size: 20px;">🌓</button>
+            <a href="#" class="login-btn">Login</a>
+        </div>
     </div>
 </header>
 
@@ -298,6 +301,7 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
         const urlParams = new URLSearchParams(window.location.search);
         const districtFromUrl = urlParams.get('district');
         const stateFromUrl = urlParams.get('state');
@@ -670,6 +674,28 @@
         document.getElementById('resultsSection').style.display = 'none';
         nextStep(1);
     }
+
+    // Theme Management
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
