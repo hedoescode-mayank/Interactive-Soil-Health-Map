@@ -12,6 +12,15 @@ A production-ready, full-stack application for soil health monitoring and analys
 - 📱 **Responsive Design**: Modern, mobile-first UI with stunning animations
 - 🔗 **API Integration**: Ready for data.gov.in API integration
 
+## 🌟 Major UI Contributions (May 2026)
+
+The following major enhancements were recently contributed:
+1. **Advanced Map Visuals**: Integrated district search, multi-layer support (Satellite/Terrain), and interactive popup charts.
+2. **Soil Health Wizard**: Replaced static forms with a multi-step recommendation wizard and Radar Chart analysis.
+3. **Sustainability Scoring**: Added dynamic scoring to promote eco-friendly fertilizer balance.
+4. **Universal Dark Mode**: Implemented site-wide dark mode with persistence.
+5. **Mobile First Design**: Fully responsive navigation and touch-optimized components.
+
 ### Technical Features
 - Micronaut 4.x framework for high performance
 - PostgreSQL with PostGIS for geospatial data
