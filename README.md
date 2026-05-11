@@ -50,8 +50,8 @@ The system follows a modern, decoupled architecture:
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/zenzxnse/soil-health-monitor.git
-cd soil-health-monitor
+git clone https://github.com/hedoescode-mayank/Interactive-Soil-Health-Map.git
+cd Interactive-Soil-Health-Map
 ```
 
 2. **Set up PostgreSQL**
@@ -88,7 +88,7 @@ EOF
 ./gradlew run
 
 # Or run the JAR
-java -jar build/libs/soil-health-monitor-1.0.0.jar
+java -jar build/libs/Interactive_Soil_Health_Map-1.0.0.jar
 ```
 
 5. **Access the application**
