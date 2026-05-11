@@ -21,6 +21,15 @@ The following major enhancements were recently contributed:
 4. **Universal Dark Mode**: Implemented site-wide dark mode with persistence.
 5. **Mobile First Design**: Fully responsive navigation and touch-optimized components.
 
+## 🛠️ Major Backend Contributions (May 2026)
+
+The core backend logic was recently hardened and architecturally improved:
+1. **Secure Hashing Migration**: Successfully migrated from SHA-256 to **BCrypt** with automatic salting for industry-standard password security.
+2. **Declarative Validation**: Integrated **Jakarta Validation** framework across all API entry points to ensure strict data integrity.
+3. **Service Layer Pattern**: Decoupled business logic into dedicated **AuthService** and **SoilService** classes, improving testability and separation of concerns.
+4. **Atomic Transactions**: Implemented transactional integrity in the registration workflow, ensuring multi-step database operations are either fully completed or rolled back.
+5. **Standardized Error Handling**: Added a **Global Exception Handler** to provide consistent, meaningful JSON error responses for all API failures.
+
 ### Technical Features
 - Micronaut 4.x framework for high performance
 - PostgreSQL with PostGIS for geospatial data
