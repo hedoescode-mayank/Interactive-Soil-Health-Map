@@ -36,6 +36,15 @@ The following major enhancements were recently contributed:
 3. **Sustainability Scoring**: Added dynamic scoring to promote eco-friendly fertilizer balance.
 4. **Universal Dark Mode**: Implemented site-wide dark mode with persistence.
 5. **Mobile First Design**: Fully responsive navigation and touch-optimized components.
+6. **Map Visibility & Data Enhancements (8 Commits)**:
+    - **Schema Expansion**: Added support for Phosphorus, Potassium, and Organic Carbon analytics.
+    - **API Hardening**: Extended Map API to serve multi-nutrient GeoJSON data.
+    - **Dynamic Legend Engine**: Implemented smart legend scaling based on selected soil parameters.
+    - **Advanced Multi-Nutrient Layers**: Added toggles for N, P, K, OC, and pH visualizations.
+    - **Interactive Popup Charts**: Integrated real-time bar charts for detailed district soil profiles.
+    - **Map Statistics Overlay**: Added dynamic district and sample counter overlay for real-time summaries.
+    - **Enhanced District Insights**: Expanded the information panel with status-aware nutrient boxes.
+    - **Global Polish**: Refactored mapping logic for improved performance and data integrity.
 
 ## 🛠️ Major Backend Contributions (May 2026)
 
