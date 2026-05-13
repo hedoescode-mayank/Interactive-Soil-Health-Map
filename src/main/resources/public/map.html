@@ -513,6 +513,16 @@
                         <div class="nutrient-box-value" id="kValue">-</div>
                         <div class="nutrient-box-status status-medium" id="kStatus">-</div>
                     </div>
+                    <div class="nutrient-box">
+                        <div class="nutrient-box-icon" style="color: #795548;">OC</div>
+                        <div class="nutrient-box-value" id="ocValue">-</div>
+                        <div class="nutrient-box-status status-medium" id="ocStatus">-</div>
+                    </div>
+                    <div class="nutrient-box">
+                        <div class="nutrient-box-icon" style="color: #009688;">pH</div>
+                        <div class="nutrient-box-value" id="phValue">-</div>
+                        <div class="nutrient-box-status status-medium" id="phStatus">-</div>
+                    </div>
                 </div>
 
                 <button class="btn-get-shc" onclick="getSHC()">Get Soil Health Card</button>
@@ -762,19 +772,26 @@
         document.getElementById('infoState').textContent = props.state_name || '-';
         document.getElementById('infoSamples').textContent = (props.samples_analyzed || 0).toLocaleString('en-IN');
 
+        // Update NPK values
         updateNutrientBox('n', props.nitrogen_avg, props.nitrogen_status);
         updateNutrientBox('p', props.phosphorus_avg, props.phosphorus_status);
         updateNutrientBox('k', props.potassium_avg, props.potassium_status);
+        
+        const ocStatus = props.oc_avg > 0.75 ? 'High' : (props.oc_avg > 0.5 ? 'Medium' : 'Low');
+        updateNutrientBox('oc', props.oc_avg, ocStatus, '%');
+        
+        const phStatus = (props.ph_avg >= 6.5 && props.ph_avg <= 7.5) ? 'Normal' : 'Critical';
+        updateNutrientBox('ph', props.ph_avg, phStatus, '');
     }
 
-    function updateNutrientBox(nutrient, value, status) {
+    function updateNutrientBox(nutrient, value, status, unit = ' kg/ha') {
         const valueEl = document.getElementById(nutrient + 'Value');
         const statusEl = document.getElementById(nutrient + 'Status');
         if (!valueEl || !statusEl) return;
 
-        valueEl.textContent = value ? value + ' kg/ha' : '-';
+        valueEl.textContent = value ? value + unit : '-';
         statusEl.textContent = status || '-';
-        statusEl.className = 'nutrient-box-status status-' + (status || '').toLowerCase();
+        statusEl.className = 'nutrient-box-status status-' + (status || 'medium').toLowerCase();
     }
 
     async function loadMapData() {
