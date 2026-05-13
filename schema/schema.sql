@@ -191,6 +191,9 @@ SELECT
     d.name AS district_name, 
     COUNT(fm.farm_id) as total_farms,
     ROUND(AVG(st.nitrogen_val), 2) as avg_n,
+    ROUND(AVG(st.phosphorus_val), 2) as avg_p,
+    ROUND(AVG(st.potassium_val), 2) as avg_k,
+    ROUND(AVG(st.organic_carbon), 2) as avg_oc,
     ROUND(AVG(st.ph_val), 2) as avg_ph
 FROM districts d
 LEFT JOIN farms fm ON d.district_id = fm.district_id
