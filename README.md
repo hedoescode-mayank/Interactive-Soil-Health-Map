@@ -12,6 +12,22 @@ A production-ready, full-stack application for soil health monitoring and analys
 - 📱 **Responsive Design**: Modern, mobile-first UI with stunning animations
 - 🔗 **API Integration**: Ready for data.gov.in API integration
 
+## 🗺️ Interactive Soil Health Map
+Our map provides a high-level overview of soil health across India.
+
+### Recent Enhancements:
+- **Comprehensive Nutrient Visualization**: Now supports visualization for Nitrogen (N), Phosphorus (P), Potassium (K), Organic Carbon (OC), and Soil pH.
+- **Dynamic Legend & Styling**: The map legend and color schemes adapt automatically based on the selected nutrient.
+- **Advanced Popups**: Interactive bar charts in popups show the full soil profile for each district.
+- **Real-time Map Statistics**: A new overlay displays the total number of districts and samples analyzed in the current view.
+- **Enhanced Sidebar**: Detailed district information panel with status indicators for all major soil parameters.
+
+## 🚀 Key Features
+- **Real-time Recommendations**: Get fertilizer doses (Urea, DAP, MOP) based on your soil test results.
+- **State-wise Filtering**: Easily filter map data by state.
+- **Modern UI**: Dark mode support and responsive design for mobile devices.
+- 🔗 **API Integration**: Ready for data.gov.in API integration
+
 ## 🌟 Major UI Contributions (May 2026)
 
 The following major enhancements were recently contributed:
