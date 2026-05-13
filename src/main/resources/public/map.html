@@ -526,8 +526,53 @@
             <button class="layer-btn" id="layerTerrain" title="Terrain View">⛰️</button>
             <button class="layer-btn" id="btnCenterMap" title="Reset View">📍</button>
         </div>
+        <div class="map-stats-overlay" id="statsOverlay">
+            <div class="stats-item">
+                <div class="stats-label">Districts</div>
+                <div class="stats-value" id="statsDistricts">0</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-label">Samples</div>
+                <div class="stats-value" id="statsSamples">0</div>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .map-stats-overlay {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: white;
+        padding: 12px 20px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        gap: 24px;
+        border-left: 4px solid var(--primary);
+    }
+
+    .stats-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stats-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--text-secondary);
+        letter-spacing: 0.5px;
+    }
+
+    .stats-value {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--primary);
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -742,6 +787,11 @@
 
             const data = await response.json();
             currentData = data;
+
+            // Update stats
+            const totalSamples = data.features.reduce((sum, f) => sum + (f.properties.samples_analyzed || 0), 0);
+            document.getElementById('statsDistricts').textContent = data.features.length;
+            document.getElementById('statsSamples').textContent = totalSamples.toLocaleString('en-IN');
 
             if (districtLayer) {
                 map.removeLayer(districtLayer);
