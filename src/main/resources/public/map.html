@@ -791,20 +791,32 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['N', 'P', 'K'],
+                labels: ['N', 'P', 'K', 'OC', 'pH'],
                 datasets: [{
-                    label: 'Nutrient Levels (kg/ha)',
-                    data: [props.nitrogen_avg, props.phosphorus_avg, props.potassium_avg],
-                    backgroundColor: ['#3498db', '#9b59b6', '#e67e22'],
+                    label: 'Soil Parameters',
+                    data: [props.nitrogen_avg, props.phosphorus_avg, props.potassium_avg, props.oc_avg * 100, props.ph_avg * 10],
+                    backgroundColor: ['#3498db', '#9b59b6', '#e67e22', '#795548', '#009688'],
                     borderRadius: 4
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (context.label === 'OC') return `OC: ${props.oc_avg}%`;
+                                if (context.label === 'pH') return `pH: ${props.ph_avg}`;
+                                return `${context.label}: ${context.raw} kg/ha`;
+                            }
+                        }
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
+                    y: { beginAtZero: true, grid: { display: false }, display: false },
                     x: { grid: { display: false } }
                 }
             }
