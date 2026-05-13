@@ -52,6 +52,9 @@ public class MapController {
                 s.name as state_name,
                 ST_AsGeoJSON(d.geom) as geometry,
                 v.avg_n as nitrogen_avg,
+                v.avg_p as phosphorus_avg,
+                v.avg_k as potassium_avg,
+                v.avg_oc as oc_avg,
                 v.avg_ph as ph_avg,
                 v.total_farms as samples_analyzed
             FROM districts d
@@ -89,8 +92,21 @@ public class MapController {
                 properties.put("district_id", rs.getLong("district_id"));
                 properties.put("district_name", rs.getString("district_name"));
                 properties.put("state_name", rs.getString("state_name"));
-                properties.put("nitrogen_avg", rs.getDouble("nitrogen_avg"));
-                properties.put("nitrogen_status", rs.getDouble("nitrogen_avg") > 280 ? "Medium" : "Low");
+                
+                double n = rs.getDouble("nitrogen_avg");
+                double p = rs.getDouble("phosphorus_avg");
+                double k = rs.getDouble("potassium_avg");
+                
+                properties.put("nitrogen_avg", n);
+                properties.put("nitrogen_status", n > 280 ? (n > 560 ? "High" : "Medium") : "Low");
+                
+                properties.put("phosphorus_avg", p);
+                properties.put("phosphorus_status", p > 10 ? (p > 25 ? "High" : "Medium") : "Low");
+                
+                properties.put("potassium_avg", k);
+                properties.put("potassium_status", k > 110 ? (k > 280 ? "High" : "Medium") : "Low");
+                
+                properties.put("oc_avg", rs.getDouble("oc_avg"));
                 properties.put("ph_avg", rs.getDouble("ph_avg"));
                 properties.put("samples_analyzed", rs.getInt("samples_analyzed"));
 
