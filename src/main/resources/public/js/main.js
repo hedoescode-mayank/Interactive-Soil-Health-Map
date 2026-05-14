@@ -126,7 +126,10 @@ function initBreadcrumbs() {
     
     path.forEach((p, index) => {
         currentPath += '/' + p;
-        const name = p.charAt(0).toUpperCase() + p.slice(1).replace(/-/g, ' ');
+        let name = p.charAt(0).toUpperCase() + p.slice(1).replace(/-/g, ' ');
+        if (p === 'recommendations') name = 'Get SHC';
+        if (p === 'map') name = 'Soil Map';
+        
         html += `<span class="separator">/</span>`;
         if (index === path.length - 1) {
             html += `<span>${name}</span>`;
