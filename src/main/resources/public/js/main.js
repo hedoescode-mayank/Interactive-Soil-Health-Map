@@ -101,10 +101,12 @@ function initPageTransitions() {
 
     // Fade out on navigation
     document.querySelectorAll('a').forEach(link => {
-        if (link.hostname === window.location.hostname && !link.hash && link.target !== '_blank') {
+        if (link.hostname === window.location.hostname && !link.hash && link.target !== '_blank' && !link.onclick) {
             link.addEventListener('click', (e) => {
                 if (!e.ctrlKey && !e.shiftKey && !e.metaKey) {
                     overlay.classList.add('active');
+                    // Safety timeout
+                    setTimeout(() => overlay.classList.remove('active'), 2000);
                 }
             });
         }
