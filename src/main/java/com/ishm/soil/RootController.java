@@ -2,6 +2,8 @@ package com.ishm.soil;
 
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,5 +77,13 @@ public class RootController {
                         "health", "/health"
                 )
         ));
+    }
+
+    /**
+     * Global 404 Not Found handler
+     */
+    @Error(status = HttpStatus.NOT_FOUND, global = true)
+    public HttpResponse<?> notFound() {
+        return HttpResponse.redirect(URI.create("/404.html"));
     }
 }
