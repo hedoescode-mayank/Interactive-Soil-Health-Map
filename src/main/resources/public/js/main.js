@@ -72,6 +72,7 @@ function initBackToTop() {
     const btn = document.createElement('div');
     btn.id = 'backToTop';
     btn.innerHTML = '↑';
+    btn.title = 'Back to Top';
     document.body.appendChild(btn);
 
     window.addEventListener('scroll', () => {
