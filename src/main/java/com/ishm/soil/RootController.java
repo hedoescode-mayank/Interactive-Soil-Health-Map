@@ -25,6 +25,29 @@ public class RootController {
     }
 
     /**
+     * Map clean URLs to static pages
+     */
+    @Get("/dashboard")
+    public HttpResponse<?> dashboard() {
+        return HttpResponse.redirect(URI.create("/dashboard.html"));
+    }
+
+    @Get("/map")
+    public HttpResponse<?> map() {
+        return HttpResponse.redirect(URI.create("/map.html"));
+    }
+
+    @Get("/recommendations")
+    public HttpResponse<?> recommendations() {
+        return HttpResponse.redirect(URI.create("/recommendations.html"));
+    }
+
+    @Get("/home")
+    public HttpResponse<?> home() {
+        return HttpResponse.redirect(URI.create("/index.html"));
+    }
+
+    /**
      * Health check endpoint
      */
     @Get("/health")
