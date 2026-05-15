@@ -151,7 +151,26 @@ public class AuthService {
     }
 
     public boolean updatePassword(String username, String oldPassword, String newPassword) throws SQLException {
-        // To be implemented
+        String selectQuery = "SELECT password_hash FROM farmers WHERE username = ?";
+        String updateQuery = "UPDATE farmers SET password_hash = ? WHERE username = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement selectStmt = conn.prepareStatement(selectQuery)) {
+            
+            selectStmt.setString(1, username);
+            ResultSet rs = selectStmt.executeQuery();
+
+            if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+                if (BCrypt.checkpw(oldPassword, storedHash)) {
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
+                        updateStmt.setString(1, hashPassword(newPassword));
+                        updateStmt.setString(2, username);
+                        return updateStmt.executeUpdate() > 0;
+                    }
+                }
+            }
+        }
         return false;
     }
 
