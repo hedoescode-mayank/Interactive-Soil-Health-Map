@@ -591,6 +591,7 @@
                 localStorage.setItem('farmer', JSON.stringify(data.farmer));
                 alert('Login successful!');
                 closeAuthModal();
+                updateAuthUI();
                 window.location.href = '/dashboard';
             } else {
                 alert(data.error || 'Login failed');
@@ -630,6 +631,34 @@
         }
     }
 
+    function updateAuthUI() {
+        const token = localStorage.getItem('token');
+        const authButtons = document.querySelector('.auth-buttons');
+        const themeBtn = document.getElementById('themeToggle').outerHTML;
+        const menuBtn = document.getElementById('menuToggle').outerHTML;
+        
+        if (token) {
+            authButtons.innerHTML = `
+                ${themeBtn}
+                <button onclick="showChangePassword()" class="btn-outline">Change Password</button>
+                <button onclick="handleLogout()" class="btn-primary">Logout</button>
+                ${menuBtn}
+            `;
+            // Re-attach theme toggle listener since innerHTML was reset
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.querySelector('.nav').classList.toggle('active');
+                document.getElementById('menuToggle').textContent = document.querySelector('.nav').classList.contains('active') ? '✕' : '☰';
+            });
+        }
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('farmer');
+        window.location.href = '/';
+    }
+
     // Close modal on outside click
     window.onclick = function(event) {
         const modal = document.getElementById('authModal');
@@ -641,6 +670,7 @@
     // Simple AOS-like animation
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
+        updateAuthUI();
         const animElements = document.querySelectorAll('[data-aos]');
         const animObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
