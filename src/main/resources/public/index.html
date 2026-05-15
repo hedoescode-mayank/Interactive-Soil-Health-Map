@@ -536,6 +536,7 @@
         const oldPassword = document.getElementById('oldPassword').value;
         const newPassword = document.getElementById('newPassword').value;
         const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        const submitBtn = e.target.querySelector('button');
 
         if (newPassword !== confirmNewPassword) {
             alert('New passwords do not match!');
@@ -550,6 +551,9 @@
         }
 
         try {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+            
             const response = await fetch('/api/auth/update-password', {
                 method: 'PUT',
                 headers: { 
@@ -569,6 +573,9 @@
         } catch (error) {
             console.error('Update password error:', error);
             alert('An error occurred. Please try again.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Update Password';
         }
     }
 
