@@ -497,12 +497,14 @@
         document.getElementById('authModal').style.display = 'flex';
         document.getElementById('loginForm').style.display = 'block';
         document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('changePasswordForm').style.display = 'none';
     }
 
     function showRegister() {
         document.getElementById('authModal').style.display = 'flex';
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('changePasswordForm').style.display = 'none';
     }
 
     function closeAuthModal() {
@@ -512,11 +514,62 @@
     function switchToRegister() {
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('changePasswordForm').style.display = 'none';
     }
 
     function switchToLogin() {
         document.getElementById('loginForm').style.display = 'block';
         document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('changePasswordForm').style.display = 'none';
+    }
+
+    function showChangePassword() {
+        document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('changePasswordForm').style.display = 'block';
+    }
+
+    // Handle Update Password
+    async function handleUpdatePassword(e) {
+        e.preventDefault();
+        const oldPassword = document.getElementById('oldPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+        if (newPassword !== confirmNewPassword) {
+            alert('New passwords do not match!');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You must be logged in to change your password.');
+            showLogin();
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/auth/update-password', {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ oldPassword, newPassword })
+            });
+
+            const data = await response.json();
+            if (response.ok && data.success) {
+                alert('Password updated successfully!');
+                closeAuthModal();
+            } else {
+                alert(data.error || 'Failed to update password');
+            }
+        } catch (error) {
+            console.error('Update password error:', error);
+            alert('An error occurred. Please try again.');
+        }
     }
 
     // Handle Login
