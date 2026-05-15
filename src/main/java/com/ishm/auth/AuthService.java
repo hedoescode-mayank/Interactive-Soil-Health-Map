@@ -150,6 +150,11 @@ public class AuthService {
         }
     }
 
+    public boolean updatePassword(String username, String oldPassword, String newPassword) throws SQLException {
+        // To be implemented
+        return false;
+    }
+
     public String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
