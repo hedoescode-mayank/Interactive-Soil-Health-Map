@@ -160,6 +160,25 @@ public class AuthController {
         }
     }
     
+    @Put("/update-password")
+    public HttpResponse<Map<String, Object>> updatePassword(@Body @Valid UpdatePasswordRequest request, java.security.Principal principal) {
+        if (principal == null) {
+            return HttpResponse.unauthorized();
+        }
+        
+        try {
+            boolean success = authService.updatePassword(principal.getName(), request.getOldPassword(), request.getNewPassword());
+            if (success) {
+                return HttpResponse.ok(Map.of("success", true, "message", "Password updated successfully"));
+            } else {
+                return HttpResponse.badRequest(Map.of("success", false, "error", "Invalid old password"));
+            }
+        } catch (SQLException e) {
+            LOG.error("Password update error", e);
+            return HttpResponse.serverError(Map.of("success", false, "error", "Database error: " + e.getMessage()));
+        }
+    }
+
     private String classifyN(double val) { return val < 280 ? "Low" : (val <= 560 ? "Medium" : "High"); }
     private String classifyP(double val) { return val < 10 ? "Low" : (val <= 25 ? "Medium" : "High"); }
     private String classifyK(double val) { return val < 110 ? "Low" : (val <= 280 ? "Medium" : "High"); }
@@ -204,4 +223,17 @@ public class AuthController {
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
     }
-}
+
+    public static class UpdatePasswordRequest {
+        @NotBlank
+        private String oldPassword;
+        
+        @NotBlank @Size(min = 6)
+        private String newPassword;
+
+        public String getOldPassword() { return oldPassword; }
+        public void setOldPassword(String oldPassword) { this.oldPassword = oldPassword; }
+        public String getNewPassword() { return newPassword; }
+        public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
+    }
+}
