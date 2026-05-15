@@ -212,6 +212,24 @@ Response 200 OK:
 }
 ```
 
+#### Update Password
+```http
+PUT /api/auth/update-password
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "oldPassword": "current_password",
+  "newPassword": "new_secure_password"
+}
+
+Response 200 OK:
+{
+  "success": true,
+  "message": "Password updated successfully"
+}
+```
+
 ### Map Endpoints
 
 #### Get All Districts (GeoJSON)
