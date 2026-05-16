@@ -147,8 +147,14 @@ public class MapController {
                 SELECT 
                     COUNT(DISTINCT d.district_id) as district_count,
                     AVG(v.avg_n) as avg_n,
+                    AVG(v.avg_p) as avg_p,
+                    AVG(v.avg_k) as avg_k,
+                    AVG(v.avg_oc) as avg_oc,
                     AVG(v.avg_ph) as avg_ph,
-                    SUM(v.total_farms) as total_samples
+                    SUM(v.total_farms) as total_samples,
+                    COUNT(*) FILTER (WHERE v.avg_n < 280) as low_n_districts,
+                    COUNT(*) FILTER (WHERE v.avg_n >= 280 AND v.avg_n < 560) as med_n_districts,
+                    COUNT(*) FILTER (WHERE v.avg_n >= 560) as high_n_districts
                 FROM districts d
                 JOIN states s ON d.state_id = s.state_id
                 LEFT JOIN vw_district_soil_stats v ON d.name = v.district_name
@@ -162,19 +168,32 @@ public class MapController {
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs.next()) {
-                    Map<String, Object> stats = new HashMap<>();
+                    Map<String, Object> stats = new LinkedHashMap<>();
                     stats.put("state", state);
                     stats.put("district_count", rs.getInt("district_count"));
-                    stats.put("avg_nitrogen", rs.getDouble("avg_n"));
-                    stats.put("avg_ph", rs.getDouble("avg_ph"));
                     stats.put("total_samples", rs.getLong("total_samples"));
+                    
+                    Map<String, Object> averages = new HashMap<>();
+                    averages.put("nitrogen", rs.getDouble("avg_n"));
+                    averages.put("phosphorus", rs.getDouble("avg_p"));
+                    averages.put("potassium", rs.getDouble("avg_k"));
+                    averages.put("oc", rs.getDouble("avg_oc"));
+                    averages.put("ph", rs.getDouble("avg_ph"));
+                    stats.put("averages", averages);
+                    
+                    Map<String, Object> distribution = new HashMap<>();
+                    distribution.put("low", rs.getInt("low_n_districts"));
+                    distribution.put("medium", rs.getInt("med_n_districts"));
+                    distribution.put("high", rs.getInt("high_n_districts"));
+                    stats.put("nitrogen_distribution", distribution);
+                    
                     return HttpResponse.ok(stats);
                 }
                 return HttpResponse.notFound();
             }
         } catch (SQLException e) {
             LOG.error("Error fetching state stats", e);
-            return HttpResponse.serverError(Map.of("error", "Database error"));
+            return HttpResponse.serverError(Map.of("error", "Database error: " + e.getMessage()));
         }
     }
 
