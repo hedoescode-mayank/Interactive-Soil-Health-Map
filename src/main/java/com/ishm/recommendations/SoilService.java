@@ -98,35 +98,49 @@ public class SoilService {
     }
 
     private double estimateNutrient(RecommendationController.RecommendationRequest request, String nutrient) {
-        if (request.getDistrict() != null) {
-            try {
-                String col = switch(nutrient) {
-                    case "nitrogen" -> "avg_n";
-                    default -> "avg_ph";
-                };
-                String query = "SELECT " + col + " FROM vw_district_soil_stats WHERE district_name = ?";
+        String col = switch(nutrient) {
+            case "nitrogen" -> "avg_n";
+            case "phosphorus" -> "avg_p";
+            case "potassium" -> "avg_k";
+            case "oc" -> "avg_oc";
+            default -> "avg_ph";
+        };
 
+        if (request.getDistrict() != null && !request.getDistrict().isEmpty()) {
+            try {
+                String query = "SELECT " + col + " FROM vw_district_soil_stats WHERE district_name = ?";
                 try (Connection conn = dataSource.getConnection();
                      PreparedStatement stmt = conn.prepareStatement(query)) {
-
                     stmt.setString(1, request.getDistrict());
                     ResultSet rs = stmt.executeQuery();
-
-                    if (rs.next()) {
-                        return rs.getDouble(1);
-                    }
+                    if (rs.next()) return rs.getDouble(1);
                 }
             } catch (SQLException e) {
-                LOG.warn("Could not fetch district data", e);
+                LOG.warn("Could not fetch district data for " + nutrient, e);
             }
         }
 
-        switch (nutrient) {
-            case "nitrogen": return 250;
-            case "phosphorus": return 15;
-            case "potassium": return 150;
-            default: return 0;
+        if (request.getState() != null && !request.getState().isEmpty()) {
+            try {
+                String query = "SELECT AVG(" + col + ") FROM vw_district_soil_stats v JOIN districts d ON v.district_name = d.name JOIN states s ON d.state_id = s.state_id WHERE s.name = ?";
+                try (Connection conn = dataSource.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(query)) {
+                    stmt.setString(1, request.getState());
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) return rs.getDouble(1);
+                }
+            } catch (SQLException e) {
+                LOG.warn("Could not fetch state data for " + nutrient, e);
+            }
         }
+
+        return switch (nutrient) {
+            case "nitrogen" -> 250.0;
+            case "phosphorus" -> 15.0;
+            case "potassium" -> 150.0;
+            case "oc" -> 0.5;
+            default -> 7.0;
+        };
     }
 
     private CropRequirements getCropRequirements(String crop) {
