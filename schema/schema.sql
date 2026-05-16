@@ -206,53 +206,36 @@ HAVING COUNT(fm.farm_id) >= 0;
 -- ========================================
 
 INSERT INTO states (state_id, name, code) VALUES 
-(1, 'Delhi', 'DL'), (2, 'Haryana', 'HR'), (3, 'Punjab', 'PB'), (4, 'Uttar Pradesh', 'UP');
+(1, 'Delhi', 'DL'), (2, 'Haryana', 'HR'), (3, 'Punjab', 'PB'), (4, 'Uttar Pradesh', 'UP'), (5, 'Maharashtra', 'MH');
 
-INSERT INTO districts (district_id, state_id, name) VALUES 
-(1, 1, 'Central Delhi'), (2, 2, 'Gurugram'), (3, 3, 'Ludhiana'), (4, 4, 'Lucknow');
+INSERT INTO districts (district_id, state_id, name, geom) VALUES 
+(1, 1, 'Central Delhi', ST_GeomFromText('POLYGON((77.15 28.60, 77.25 28.60, 77.25 28.70, 77.15 28.70, 77.15 28.60))', 4326)),
+(2, 2, 'Gurugram', ST_GeomFromText('POLYGON((76.90 28.35, 77.10 28.35, 77.10 28.55, 76.90 28.55, 76.90 28.35))', 4326)),
+(3, 3, 'Ludhiana', ST_GeomFromText('POLYGON((75.70 30.80, 75.95 30.80, 75.95 31.00, 75.70 31.00, 75.70 30.80))', 4326)),
+(4, 4, 'Lucknow', ST_GeomFromText('POLYGON((80.85 26.75, 81.05 26.75, 81.05 26.95, 80.85 26.95, 80.85 26.75))', 4326)),
+(5, 5, 'Pune', ST_GeomFromText('POLYGON((73.75 18.45, 73.95 18.45, 73.95 18.65, 73.75 18.65, 73.75 18.45))', 4326));
 
 INSERT INTO crops (crop_id, crop_name, season) VALUES 
 (1, 'Wheat', 'Rabi'), (2, 'Rice', 'Kharif'), (3, 'Maize', 'Kharif'), (4, 'Sugarcane', 'Annual');
 
--- Inserting 22 Farmers (to be safe)
--- Password 'password123' hash: 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
+-- Inserting 22 Farmers
 INSERT INTO farmers (farmer_id, username, password_hash, full_name, phone) VALUES
 (1, 'farmer1', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Rajesh Kumar', '9876543001'),
 (2, 'farmer2', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Amit Singh', '9876543002'),
 (3, 'farmer3', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Sita Devi', '9876543003'),
 (4, 'farmer4', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Vikram Yadav', '9876543004'),
 (5, 'farmer5', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Priya Sharma', '9876543005'),
-(6, 'farmer6', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Sunil Verma', '9876543006'),
-(7, 'farmer7', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Anita Jha', '9876543007'),
-(8, 'farmer8', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Rahul Gupta', '9876543008'),
-(9, 'farmer9', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Kiran Pal', '9876543009'),
-(10, 'farmer10', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Deepak Mahto', '9876543010'),
-(11, 'farmer11', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Sanjay Rawat', '9876543011'),
-(12, 'farmer12', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Geeta Rani', '9876543012'),
-(13, 'farmer13', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Neha Tyagi', '9876543013'),
-(14, 'farmer14', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Rakesh Roshan', '9876543014'),
-(15, 'farmer15', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Ramesh Chandra', '9876543015'),
-(16, 'farmer16', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Ravi Kant', '9876543016'),
-(17, 'farmer17', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Vijay Maurya', '9876543017'),
-(18, 'farmer18', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Mohan Lal', '9876543018'),
-(19, 'farmer19', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Ram Pratap', '9876543019'),
-(20, 'farmer20', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'John Doe', '9876543020');
+(21, 'farmer21', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Puneet Singh', '9876543021');
 
 -- Farms for Farmers
 INSERT INTO farms (farm_id, farmer_id, district_id, postal_code, area_hectares) VALUES
 (1, 1, 1, '110001', 2.5), (2, 2, 2, '122001', 1.8), (3, 3, 3, '141001', 4.0), (4, 4, 4, '226001', 3.2),
-(5, 5, 1, '110005', 1.2), (6, 6, 2, '122002', 2.1), (7, 7, 3, '141005', 5.5), (8, 8, 4, '226005', 0.8),
-(9, 9, 1, '110009', 2.9), (10, 10, 2, '122003', 3.4), (11, 11, 3, '141010', 1.5), (12, 12, 4, '226010', 2.2),
-(13, 13, 1, '110013', 4.1), (14, 14, 2, '122015', 0.5), (15, 15, 3, '141020', 6.0), (16, 16, 4, '226020', 3.0),
-(17, 17, 1, '110017', 2.4), (18, 18, 2, '122020', 1.9), (19, 19, 3, '141030', 3.7), (20, 20, 4, '226025', 2.8);
+(5, 5, 5, '411001', 2.2), (21, 21, 5, '411045', 3.5);
 
 -- Soil Tests for Farmers
-INSERT INTO soil_tests (test_id, farm_id, nitrogen_val, phosphorus_val, potassium_val, ph_val) VALUES
-(1, 1, 280, 25, 150, 7.2), (2, 2, 190, 15, 120, 6.5), (3, 3, 350, 30, 210, 7.8), (4, 4, 210, 18, 140, 6.2),
-(5, 5, 240, 22, 160, 7.0), (6, 6, 310, 28, 190, 7.4), (7, 7, 150, 10, 100, 5.8), (8, 8, 400, 35, 250, 8.2),
-(9, 9, 275, 24, 155, 7.1), (10, 10, 220, 19, 145, 6.8), (11, 11, 330, 29, 220, 7.6), (12, 12, 185, 14, 115, 6.4),
-(13, 13, 295, 26, 170, 7.3), (14, 14, 205, 17, 135, 6.1), (15, 15, 360, 32, 230, 7.9), (16, 16, 215, 20, 150, 6.7),
-(17, 17, 255, 21, 165, 7.2), (18, 18, 305, 27, 180, 7.5), (19, 19, 165, 12, 110, 5.9), (20, 20, 390, 34, 240, 8.1);
+INSERT INTO soil_tests (test_id, farm_id, nitrogen_val, phosphorus_val, potassium_val, ph_val, organic_carbon) VALUES
+(1, 1, 280, 25, 150, 7.2, 0.65), (2, 2, 190, 15, 120, 6.5, 0.45), (3, 3, 350, 30, 210, 7.8, 0.85), (4, 4, 210, 18, 140, 6.2, 0.55),
+(5, 5, 240, 22, 160, 7.0, 0.60), (21, 21, 310, 28, 190, 7.4, 0.70);
 
 -- Recommendations for Farmers
 INSERT INTO fertilizer_recommendations (rec_id, test_id, crop_id, urea_dose, dap_dose, mop_dose) VALUES
