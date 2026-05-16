@@ -72,7 +72,17 @@ The system follows a modern, decoupled architecture:
 - **Database**: PostgreSQL with PostGIS for robust spatial data handling and efficient nutrient analysis.
 - **Security**: Stateless JWT-based authentication ensuring secure access across all endpoints.
 
-## 🚀 Quick Start
+### 🗺️ Interactive Soil Map & Real Data Connection
+The application now features a robust connection between the Leaflet-based map and the PostgreSQL/PostGIS backend:
+- **Dynamic GeoJSON Generation**: Districts are fetched in real-time from the database with integrated soil health metrics.
+- **PostGIS Integration**: Spatial boundaries (MultiPolygons) are handled via PostGIS, ensuring precise geographical mapping.
+- **Multi-level Fallback**: If specific district data is missing, the system intelligently falls back to state averages for fertilizer recommendations.
+- **Rich Visualization**: Supports visualization of Nitrogen, Phosphorus, Potassium, Organic Carbon, and pH levels with interactive charts.
+- **State Statistics**: Real-time aggregation of state-wise soil health distribution (High/Medium/Low).
+
+---
+
+### 🚀 Getting Started
 
 ### Prerequisites
 - Java 17 or higher
