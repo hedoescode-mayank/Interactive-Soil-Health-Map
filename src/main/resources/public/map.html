@@ -797,27 +797,51 @@
     }
 
     async function loadMapData() {
+        const statsOverlay = document.getElementById('statsOverlay');
+        const mapContainer = document.getElementById('map');
+        
         try {
             const state = document.getElementById('stateFilter').value;
             const url = state ? `/api/map/districts?state=${encodeURIComponent(state)}` : '/api/map/districts';
 
+            // Show loading state
+            statsOverlay.innerHTML = '<div style="padding: 10px;">Loading real-time data...</div>';
+
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Failed to load data');
+            if (!response.ok) throw new Error('Backend API unavailable');
 
             const data = await response.json();
             currentData = data;
 
-            // Update stats
+            // Update stats from real data
             const totalSamples = data.features.reduce((sum, f) => sum + (f.properties.samples_analyzed || 0), 0);
-            document.getElementById('statsDistricts').textContent = data.features.length;
-            document.getElementById('statsSamples').textContent = totalSamples.toLocaleString('en-IN');
+            
+            // Rebuild stats overlay
+            statsOverlay.innerHTML = `
+                <div class="stats-item">
+                    <div class="stats-label">Districts</div>
+                    <div class="stats-value" id="statsDistricts">${data.features.length}</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-label">Total Samples</div>
+                    <div class="stats-value" id="statsSamples">${totalSamples.toLocaleString('en-IN')}</div>
+                </div>
+                ${data.metadata ? `<div style="font-size: 10px; color: #999; margin-left: 10px;">Updated: ${new Date(data.metadata.timestamp).toLocaleTimeString()}</div>` : ''}
+            `;
 
             if (districtLayer) {
                 map.removeLayer(districtLayer);
             }
 
-            if (data.features && data.features.length > 0) {
-                districtLayer = L.geoJSON(data, {
+            const validFeatures = data.features.filter(f => f.geometry !== null);
+            const invalidCount = data.features.length - validFeatures.length;
+
+            if (invalidCount > 0) {
+                console.warn(`${invalidCount} districts missing spatial data`);
+            }
+
+            if (validFeatures.length > 0) {
+                districtLayer = L.geoJSON({ type: "FeatureCollection", features: validFeatures }, {
                     style: style,
                     onEachFeature: function(feature, layer) {
                         layer.on({
@@ -829,6 +853,10 @@
                         const props = feature.properties;
                         const popupContent = `
                             <div class="popup-title">${props.district_name}, ${props.state_name}</div>
+                            <div class="popup-row">
+                                <strong>Status:</strong>
+                                <span class="nutrient-box-status status-${(props[currentNutrient + '_status'] || 'medium').toLowerCase()}">${props[currentNutrient + '_status'] || 'N/A'}</span>
+                            </div>
                             <div class="popup-row">
                                 <strong>Samples:</strong>
                                 <span>${props.samples_analyzed.toLocaleString('en-IN')}</span>
@@ -844,11 +872,17 @@
                         });
                     }
                 }).addTo(map);
+                
+                if (state) {
+                    map.fitBounds(districtLayer.getBounds());
+                }
             } else {
-                loadDemoData();
+                if (!state) loadDemoData();
+                else statsOverlay.innerHTML = '<div style="padding: 10px; color: #e74c3c;">No spatial data for this state</div>';
             }
         } catch (error) {
             console.error('Error loading map data:', error);
+            statsOverlay.innerHTML = '<div style="padding: 10px; color: #e74c3c;">Connection Error - Using Offline Data</div>';
             loadDemoData();
         }
     }
