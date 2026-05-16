@@ -44,18 +44,13 @@ public class MapController {
      * Get districts from local database
      */
     private Map<String, Object> getDistrictsFromDatabase(Optional<String> state) throws SQLException {
-        // Use View and Joins
         String query = """
             SELECT 
                 d.district_id,
                 d.name as district_name,
                 s.name as state_name,
                 ST_AsGeoJSON(d.geom) as geometry,
-                v.avg_n as nitrogen_avg,
-                v.avg_p as phosphorus_avg,
-                v.avg_k as potassium_avg,
-                v.avg_oc as oc_avg,
-                v.avg_ph as ph_avg,
+                v.avg_n, v.avg_p, v.avg_k, v.avg_oc, v.avg_ph,
                 v.total_farms as samples_analyzed
             FROM districts d
             JOIN states s ON d.state_id = s.state_id
@@ -85,7 +80,11 @@ public class MapController {
                     try {
                         JsonNode geomNode = objectMapper.readTree(geomJson);
                         feature.put("geometry", objectMapper.convertValue(geomNode, Map.class));
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        LOG.warn("Failed to parse geometry for district: " + rs.getString("district_name"));
+                    }
+                } else {
+                    feature.put("geometry", null);
                 }
 
                 Map<String, Object> properties = new HashMap<>();
@@ -93,21 +92,27 @@ public class MapController {
                 properties.put("district_name", rs.getString("district_name"));
                 properties.put("state_name", rs.getString("state_name"));
                 
-                double n = rs.getDouble("nitrogen_avg");
-                double p = rs.getDouble("phosphorus_avg");
-                double k = rs.getDouble("potassium_avg");
+                double n = rs.getDouble("avg_n");
+                double p = rs.getDouble("avg_p");
+                double k = rs.getDouble("avg_k");
+                double oc = rs.getDouble("avg_oc");
+                double ph = rs.getDouble("avg_ph");
                 
                 properties.put("nitrogen_avg", n);
-                properties.put("nitrogen_status", n > 280 ? (n > 560 ? "High" : "Medium") : "Low");
+                properties.put("nitrogen_status", calculateStatus(n, 280, 560));
                 
                 properties.put("phosphorus_avg", p);
-                properties.put("phosphorus_status", p > 10 ? (p > 25 ? "High" : "Medium") : "Low");
+                properties.put("phosphorus_status", calculateStatus(p, 10, 25));
                 
                 properties.put("potassium_avg", k);
-                properties.put("potassium_status", k > 110 ? (k > 280 ? "High" : "Medium") : "Low");
+                properties.put("potassium_status", calculateStatus(k, 110, 280));
                 
-                properties.put("oc_avg", rs.getDouble("oc_avg"));
-                properties.put("ph_avg", rs.getDouble("ph_avg"));
+                properties.put("oc_avg", oc);
+                properties.put("oc_status", oc > 0.75 ? "High" : (oc > 0.5 ? "Medium" : "Low"));
+                
+                properties.put("ph_avg", ph);
+                properties.put("ph_status", (ph >= 6.5 && ph <= 7.5) ? "Neutral" : (ph < 6.5 ? "Acidic" : "Alkaline"));
+                
                 properties.put("samples_analyzed", rs.getInt("samples_analyzed"));
 
                 feature.put("properties", properties);
@@ -118,7 +123,18 @@ public class MapController {
         Map<String, Object> geoJson = new HashMap<>();
         geoJson.put("type", "FeatureCollection");
         geoJson.put("features", features);
+        geoJson.put("metadata", Map.of(
+            "timestamp", System.currentTimeMillis(),
+            "count", features.size()
+        ));
         return geoJson;
+    }
+
+    private String calculateStatus(double val, double low, double high) {
+        if (val <= 0) return "Unknown";
+        if (val < low) return "Low";
+        if (val < high) return "Medium";
+        return "High";
     }
 
     /**
