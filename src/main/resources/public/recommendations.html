@@ -158,6 +158,8 @@
         <!-- Results Section (Initially Hidden) -->
         <div id="resultsSection" class="results-container" style="display: none;">
             <h2>Fertilizer Recommendations</h2>
+            <div id="phWarning" class="alert alert-warning" style="display: none; padding: 15px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 20px;"></div>
+
 
             <div class="results-grid">
                 <!-- Soil Analysis Radar Chart -->
@@ -428,6 +430,17 @@
     function displayRecommendations(data) {
         document.getElementById('resultsSection').style.display = 'block';
 
+        // Check for pH warning
+        const phWarning = document.getElementById('phWarning');
+        if (phWarning && data.ph) {
+            if (data.ph < 5.5 || data.ph > 8.5) {
+                phWarning.style.display = 'block';
+                phWarning.innerHTML = `<strong>Warning:</strong> Soil pH is ${data.ph < 5.5 ? 'too acidic' : 'too alkaline'} (${data.ph}). Consider applying ${data.ph < 5.5 ? 'lime' : 'gypsum'}.`;
+            } else {
+                phWarning.style.display = 'none';
+            }
+        }
+
         // Update Radar Chart
         renderRadarChart(data);
 
@@ -553,7 +566,8 @@
             crop: crop,
             n: n,
             p: p,
-            k: k
+            k: k,
+            ph: parseFloat(formData.ph) || 7.0
         };
 
         displayRecommendations(recommendations);
