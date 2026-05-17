@@ -459,7 +459,7 @@
         // Update tips
         const tips = generateTips(data.nitrogenStatus, data.phosphorusStatus, data.potassiumStatus, crop);
         const tipsList = document.getElementById('additional-tips');
-        tipsList.innerHTML = tips.map(tip => `<li>${tip}</li>`).join('');
+        tipsList.innerHTML = tips.map(tip => `<li><span style="color: #27ae60; margin-right: 8px;">✓</span>${tip}</li>`).join('');
 
         document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     }
