@@ -447,9 +447,9 @@
         // Update Sustainability Score
         updateSustainabilityScore(data);
 
-        document.getElementById('urea-dose').textContent = `${data.ureaDose} kg/ha`;
-        document.getElementById('dap-dose').textContent = `${data.dapDose} kg/ha`;
-        document.getElementById('mop-dose').textContent = `${data.mopDose} kg/ha`;
+        document.getElementById('urea-dose').innerHTML = `${data.ureaDose} kg/ha ${data.ureaDose > 200 ? '<br><span style="color:#e74c3c;font-size:12px;font-weight:normal;">(High Dose)</span>' : ''}`;
+        document.getElementById('dap-dose').innerHTML = `${data.dapDose} kg/ha ${data.dapDose > 100 ? '<br><span style="color:#e74c3c;font-size:12px;font-weight:normal;">(High Dose)</span>' : ''}`;
+        document.getElementById('mop-dose').innerHTML = `${data.mopDose} kg/ha ${data.mopDose > 100 ? '<br><span style="color:#e74c3c;font-size:12px;font-weight:normal;">(High Dose)</span>' : ''}`;
 
         // Update schedule based on crop
         const crop = data.crop || 'wheat';
