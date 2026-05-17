@@ -230,6 +230,12 @@
                     </div>
                 </div>
 
+                <!-- Micro-nutrients -->
+                <div class="micronutrients-card status-card">
+                    <h4>Micro-nutrients</h4>
+                    <p id="micro-nutrients-rec" style="font-size: 14px; margin-top: 10px; line-height: 1.5; color: var(--text-color);">Calculating based on crop needs...</p>
+                </div>
+
                 <!-- Additional Recommendations -->
                 <div class="tips-card">
                     <h4>Additional Tips</h4>
@@ -473,6 +479,24 @@
         const tips = generateTips(data.nitrogenStatus, data.phosphorusStatus, data.potassiumStatus, crop);
         const tipsList = document.getElementById('additional-tips');
         tipsList.innerHTML = tips.map(tip => `<li><span style="color: #27ae60; margin-right: 8px;">✓</span>${tip}</li>`).join('');
+
+        // Update micro-nutrients
+        const microRecs = {
+            wheat: "Zinc Sulphate @ 25 kg/ha if deficiency is observed.",
+            rice: "Zinc Sulphate @ 25 kg/ha as basal or 0.5% foliar spray.",
+            maize: "Apply Zinc Sulphate @ 20 kg/ha as basal dose.",
+            cotton: "Magnesium Sulphate @ 50 kg/ha if reddening of leaves occurs.",
+            sugarcane: "Ferrous Sulphate 1% spray if chlorosis is observed.",
+            mustard: "Borax @ 10 kg/ha is recommended.",
+            tomato: "Boron and Zinc foliar sprays during flowering.",
+            potato: "Zinc Sulphate @ 25 kg/ha as basal.",
+            groundnut: "Gypsum @ 400 kg/ha at pegging stage.",
+            onion: "Sulphur @ 20-30 kg/ha improves pungency and quality."
+        };
+        const microRecElement = document.getElementById('micro-nutrients-rec');
+        if (microRecElement) {
+            microRecElement.textContent = microRecs[crop] || "General micro-nutrients supplement recommended based on local soil tests.";
+        }
 
         document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     }
