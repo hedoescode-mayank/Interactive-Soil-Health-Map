@@ -37,5 +37,104 @@
     </div>
 </header>
 
+<!-- Admin Login Section -->
+<section class="admin-login-section" id="adminLoginSection">
+    <div class="admin-login-wrapper">
+        <!-- Decorative floating orbs -->
+        <div class="admin-orb admin-orb-1"></div>
+        <div class="admin-orb admin-orb-2"></div>
+        <div class="admin-orb admin-orb-3"></div>
+
+        <div class="admin-login-card" id="adminLoginCard">
+            <!-- Admin badge -->
+            <div class="admin-badge">
+                <div class="admin-badge-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <span>Administrator Access</span>
+            </div>
+
+            <h2 class="admin-login-title">Admin Portal</h2>
+            <p class="admin-login-subtitle">Sign in to manage the Soil Health Map platform</p>
+
+            <!-- Admin Login Form -->
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="admin-form-group">
+                    <label for="adminUsername">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        Admin ID
+                    </label>
+                    <input type="text" id="adminUsername" placeholder="Enter your admin ID" required autocomplete="username">
+                    <div class="input-focus-line"></div>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="adminPassword">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        Password
+                    </label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="adminPassword" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" class="password-toggle-btn" onclick="toggleAdminPassword()" title="Show password">
+                            <svg id="eyeIcon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-focus-line"></div>
+                </div>
+
+                <div class="admin-form-options">
+                    <label class="admin-checkbox">
+                        <input type="checkbox" id="rememberAdmin">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="admin-forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="admin-login-btn" id="adminSubmitBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loader" style="display:none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                        </svg>
+                    </span>
+                    <svg class="btn-arrow" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="admin-divider">
+                <span>or</span>
+            </div>
+
+            <!-- Back to farmer login link -->
+            <div class="admin-alt-login">
+                <p>Are you a farmer? <a href="/home" onclick="showLogin && showLogin()">Farmer Login →</a></p>
+            </div>
+        </div>
+
+        <!-- Security notice -->
+        <div class="admin-security-notice">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>Secure connection • 256-bit encryption • Government authorized</span>
+        </div>
+    </div>
+</section>
+
 </body>
 </html>
