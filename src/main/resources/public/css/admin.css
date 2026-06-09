@@ -529,3 +529,77 @@
     }
 }
 
+/* ===== Toast Notifications ===== */
+.admin-toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    border-radius: var(--admin-radius);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    color: white;
+    z-index: 9999;
+    box-shadow: var(--admin-shadow-lg);
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(10px);
+    max-width: 400px;
+}
+
+.admin-toast.show {
+    transform: translateX(0);
+}
+
+.admin-toast-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.admin-toast-error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.admin-toast-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.admin-toast-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    line-height: 1.4;
+}
+
+/* ===== Shake Animation ===== */
+@keyframes shakeCard {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+    20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+/* ===== Admin Header Accent ===== */
+.admin-header {
+    border-bottom: 2px solid transparent;
+    background-image: linear-gradient(var(--header-bg), var(--header-bg)),
+                      var(--admin-gradient);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
