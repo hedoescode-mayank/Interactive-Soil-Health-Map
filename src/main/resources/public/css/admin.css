@@ -1,0 +1,89 @@
+/* Admin Portal Styles - Interactive Soil Health Map */
+
+/* ===== Admin Design Tokens ===== */
+:root {
+    --admin-primary: #6366f1;
+    --admin-primary-dark: #4f46e5;
+    --admin-primary-light: #818cf8;
+    --admin-accent: #f59e0b;
+    --admin-success: #10b981;
+    --admin-warning: #f59e0b;
+    --admin-danger: #ef4444;
+    --admin-info: #3b82f6;
+
+    --admin-bg: #f1f5f9;
+    --admin-surface: #ffffff;
+    --admin-surface-hover: #f8fafc;
+    --admin-border: #e2e8f0;
+
+    --admin-text: #1e293b;
+    --admin-text-secondary: #64748b;
+    --admin-text-muted: #94a3b8;
+
+    --admin-sidebar-width: 280px;
+    --admin-header-height: 72px;
+
+    --admin-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+    --admin-glass: rgba(255, 255, 255, 0.7);
+    --admin-glass-border: rgba(255, 255, 255, 0.3);
+
+    --admin-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --admin-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --admin-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --admin-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+
+    --admin-radius: 12px;
+    --admin-radius-lg: 16px;
+    --admin-radius-xl: 20px;
+
+    --admin-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --admin-transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Overrides for Admin */
+[data-theme="dark"] {
+    --admin-bg: #0f172a;
+    --admin-surface: #1e293b;
+    --admin-surface-hover: #334155;
+    --admin-border: #334155;
+    --admin-text: #f1f5f9;
+    --admin-text-secondary: #94a3b8;
+    --admin-text-muted: #64748b;
+    --admin-glass: rgba(30, 41, 59, 0.8);
+    --admin-glass-border: rgba(51, 65, 85, 0.5);
+    --admin-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --admin-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --admin-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Admin Login Section ===== */
+.admin-login-section {
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--admin-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-login-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+    animation: adminBgFloat 20s ease-in-out infinite;
+}
+
+@keyframes adminBgFloat {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(2%, 1%) rotate(1deg); }
+    66% { transform: translate(-1%, 2%) rotate(-1deg); }
+}
