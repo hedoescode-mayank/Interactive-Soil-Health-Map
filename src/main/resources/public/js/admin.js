@@ -182,7 +182,32 @@ function showAdminToast(message, type = 'info') {
 function checkAdminSession() {
     const adminToken = localStorage.getItem('adminToken');
     if (adminToken) {
-        // If already logged in, redirect to admin dashboard
-        // window.location.href = '/admin/dashboard';
+        showDashboardPreview();
     }
+}
+
+// ===== Show Dashboard Preview =====
+function showDashboardPreview() {
+    const loginSection = document.getElementById('adminLoginSection');
+    const dashboard = document.getElementById('adminDashboard');
+    const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+
+    if (loginSection) loginSection.style.display = 'none';
+    if (dashboard) {
+        dashboard.style.display = 'block';
+        const nameDisplay = document.getElementById('adminNameDisplay');
+        if (nameDisplay && adminUser.name) {
+            nameDisplay.textContent = adminUser.name;
+        }
+    }
+}
+
+// ===== Admin Logout =====
+function handleAdminLogout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    showAdminToast('Logged out successfully', 'info');
+    setTimeout(() => {
+        window.location.reload();
+    }, 800);
 }
