@@ -137,7 +137,7 @@
     </div>
 </section>
 
-<!-- Admin Dashboard Preview (shown after login) -->
+<!-- Admin Dashboard (shown after login) -->
 <section class="admin-dashboard-preview" id="adminDashboard" style="display:none;">
     <div class="container">
         <div class="dashboard-welcome">
@@ -167,10 +167,10 @@
                     </svg>
                 </div>
                 <div class="stat-card-info">
-                    <span class="stat-card-value">12,847</span>
+                    <span class="stat-card-value" id="statFarmersValue">—</span>
                     <span class="stat-card-label">Registered Farmers</span>
                 </div>
-                <span class="stat-trend positive">↑ 8.2%</span>
+                <span class="stat-trend positive" id="statFarmersTrend">↑ —%</span>
             </div>
 
             <div class="admin-stat-card" id="statSamples">
@@ -180,10 +180,10 @@
                     </svg>
                 </div>
                 <div class="stat-card-info">
-                    <span class="stat-card-value">73,205</span>
+                    <span class="stat-card-value" id="statSamplesValue">—</span>
                     <span class="stat-card-label">Soil Samples</span>
                 </div>
-                <span class="stat-trend positive">↑ 12.5%</span>
+                <span class="stat-trend positive" id="statSamplesTrend">↑ —%</span>
             </div>
 
             <div class="admin-stat-card" id="statCards">
@@ -193,10 +193,10 @@
                     </svg>
                 </div>
                 <div class="stat-card-info">
-                    <span class="stat-card-value">41,600</span>
+                    <span class="stat-card-value" id="statCardsValue">—</span>
                     <span class="stat-card-label">SHC Generated</span>
                 </div>
-                <span class="stat-trend positive">↑ 5.7%</span>
+                <span class="stat-trend positive" id="statCardsTrend">↑ —%</span>
             </div>
 
             <div class="admin-stat-card" id="statDistricts">
@@ -207,10 +207,10 @@
                     </svg>
                 </div>
                 <div class="stat-card-info">
-                    <span class="stat-card-value">528</span>
+                    <span class="stat-card-value" id="statDistrictsValue">—</span>
                     <span class="stat-card-label">Districts Covered</span>
                 </div>
-                <span class="stat-trend neutral">→ 0%</span>
+                <span class="stat-trend neutral" id="statDistrictsTrend">→ 0%</span>
             </div>
         </div>
 
@@ -218,7 +218,7 @@
         <div class="admin-quick-actions">
             <h3>Quick Actions</h3>
             <div class="actions-grid">
-                <button class="action-card" id="actionManageUsers">
+                <button class="action-card" id="actionManageUsers" onclick="showAdminPanel('users')">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                         <circle cx="9" cy="7" r="4"/>
@@ -227,13 +227,13 @@
                     </svg>
                     <span>Manage Users</span>
                 </button>
-                <button class="action-card" id="actionViewReports">
+                <button class="action-card" id="actionViewReports" onclick="showAdminPanel('reports')">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
                     </svg>
                     <span>View Reports</span>
                 </button>
-                <button class="action-card" id="actionSoilData">
+                <button class="action-card" id="actionSoilData" onclick="showAdminPanel('soildata')">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <ellipse cx="12" cy="5" rx="9" ry="3"/>
                         <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
@@ -241,17 +241,226 @@
                     </svg>
                     <span>Soil Data</span>
                 </button>
-                <button class="action-card" id="actionSettings">
+                <button class="action-card" id="actionAuditLogs" onclick="showAdminPanel('audit')">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="3"/>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
                     </svg>
-                    <span>Settings</span>
+                    <span>Audit Logs</span>
                 </button>
             </div>
         </div>
+
+        <!-- ========================================== -->
+        <!-- MANAGEMENT PANELS (toggled by quick actions) -->
+        <!-- ========================================== -->
+
+        <!-- User Management Panel -->
+        <div class="admin-panel" id="panelUsers" style="display:none;">
+            <div class="panel-header">
+                <h3>👥 Farmer Management</h3>
+                <div class="panel-controls">
+                    <input type="text" id="farmerSearchInput" placeholder="Search by name, username, or district..." class="panel-search">
+                    <button onclick="loadFarmers()" class="panel-btn primary">🔄 Refresh</button>
+                    <button onclick="closeAdminPanel('users')" class="panel-btn">✕ Close</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="admin-table" id="farmersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Phone</th>
+                            <th>District</th>
+                            <th>State</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="farmersTableBody">
+                        <tr><td colspan="9" class="loading-cell">Loading farmers...</td></tr>
+                    </tbody>
+                </table>
+                <div class="pagination" id="farmersPagination"></div>
+            </div>
+        </div>
+
+        <!-- Reports Panel -->
+        <div class="admin-panel" id="panelReports" style="display:none;">
+            <div class="panel-header">
+                <h3>📊 Reports & Analytics</h3>
+                <div class="panel-controls">
+                    <button onclick="loadReports()" class="panel-btn primary">🔄 Refresh</button>
+                    <button onclick="closeAdminPanel('reports')" class="panel-btn">✕ Close</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <!-- NPK Distribution -->
+                <div class="report-section">
+                    <h4>NPK Status Distribution</h4>
+                    <div class="report-grid" id="npkDistribution">
+                        <div class="report-card" id="reportNitrogen">
+                            <h5>Nitrogen (N)</h5>
+                            <div class="status-bars" id="nitrogenBars"></div>
+                        </div>
+                        <div class="report-card" id="reportPhosphorus">
+                            <h5>Phosphorus (P)</h5>
+                            <div class="status-bars" id="phosphorusBars"></div>
+                        </div>
+                        <div class="report-card" id="reportPotassium">
+                            <h5>Potassium (K)</h5>
+                            <div class="status-bars" id="potassiumBars"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- District Stats Table -->
+                <div class="report-section">
+                    <h4>District-wise Soil Statistics</h4>
+                    <table class="admin-table" id="districtStatsTable">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Total Farms</th>
+                                <th>Avg N</th>
+                                <th>Avg P</th>
+                                <th>Avg K</th>
+                                <th>Avg pH</th>
+                                <th>Avg OC</th>
+                            </tr>
+                        </thead>
+                        <tbody id="districtStatsBody">
+                            <tr><td colspan="7" class="loading-cell">Loading reports...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Crop Stats -->
+                <div class="report-section">
+                    <h4>Crop Recommendation Statistics</h4>
+                    <table class="admin-table" id="cropStatsTable">
+                        <thead>
+                            <tr>
+                                <th>Crop</th>
+                                <th>Recommendations</th>
+                                <th>Avg Urea (kg/ha)</th>
+                                <th>Avg DAP (kg/ha)</th>
+                                <th>Avg MOP (kg/ha)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cropStatsBody">
+                            <tr><td colspan="5" class="loading-cell">Loading crop stats...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Soil Data Panel -->
+        <div class="admin-panel" id="panelSoildata" style="display:none;">
+            <div class="panel-header">
+                <h3>🧪 Soil Test Data</h3>
+                <div class="panel-controls">
+                    <input type="text" id="soilDistrictFilter" placeholder="Filter by district..." class="panel-search">
+                    <button onclick="loadSoilData()" class="panel-btn primary">🔄 Refresh</button>
+                    <button onclick="closeAdminPanel('soildata')" class="panel-btn">✕ Close</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="admin-table" id="soilDataTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Farmer</th>
+                            <th>District</th>
+                            <th>Date</th>
+                            <th>N</th>
+                            <th>P</th>
+                            <th>K</th>
+                            <th>pH</th>
+                            <th>OC</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="soilDataBody">
+                        <tr><td colspan="10" class="loading-cell">Loading soil data...</td></tr>
+                    </tbody>
+                </table>
+                <div class="pagination" id="soilDataPagination"></div>
+            </div>
+        </div>
+
+        <!-- Audit Logs Panel -->
+        <div class="admin-panel" id="panelAudit" style="display:none;">
+            <div class="panel-header">
+                <h3>📋 Audit Logs</h3>
+                <div class="panel-controls">
+                    <button onclick="loadAuditLogs()" class="panel-btn primary">🔄 Refresh</button>
+                    <button onclick="closeAdminPanel('audit')" class="panel-btn">✕ Close</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="admin-table" id="auditLogsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Table</th>
+                            <th>Action</th>
+                            <th>Details</th>
+                            <th>Changed By</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditLogsBody">
+                        <tr><td colspan="6" class="loading-cell">Loading audit logs...</td></tr>
+                    </tbody>
+                </table>
+                <div class="pagination" id="auditLogsPagination"></div>
+            </div>
+        </div>
+
     </div>
 </section>
+
+<!-- Farmer Edit Modal -->
+<div class="admin-modal-overlay" id="farmerEditModal" style="display:none;">
+    <div class="admin-modal">
+        <div class="modal-header">
+            <h3>Edit Farmer</h3>
+            <button onclick="closeFarmerModal()" class="modal-close">✕</button>
+        </div>
+        <form id="farmerEditForm" onsubmit="saveFarmerEdit(event)">
+            <input type="hidden" id="editFarmerId">
+            <div class="modal-body">
+                <div class="form-row">
+                    <label for="editFullName">Full Name</label>
+                    <input type="text" id="editFullName" required>
+                </div>
+                <div class="form-row">
+                    <label for="editPhone">Phone</label>
+                    <input type="text" id="editPhone" pattern="[0-9]{10}" title="10-digit phone number">
+                </div>
+                <div class="form-row">
+                    <label for="editIsActive">Status</label>
+                    <select id="editIsActive">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeFarmerModal()" class="panel-btn">Cancel</button>
+                <button type="submit" class="panel-btn primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

@@ -96,6 +96,19 @@ CREATE TABLE audit_logs (
     changed_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Admins Table (For Admin Portal)
+CREATE TABLE admins (
+    admin_id SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+    email VARCHAR(200),
+    role VARCHAR(50) DEFAULT 'admin',
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP
+);
+
 -- ========================================
 -- 2. PL/pgSQL: FUNCTIONS, PROCEDURES, TRIGGERS, CURSORS
 -- ========================================
@@ -245,6 +258,10 @@ INSERT INTO fertilizer_recommendations (rec_id, test_id, crop_id, urea_dose, dap
 (13, 13, 1, 48, 19, 29), (14, 14, 2, 68, 28, 38), (15, 15, 3, 38, 14, 24), (16, 16, 1, 64, 23, 33),
 (17, 17, 2, 53, 21, 31), (18, 18, 3, 43, 17, 27), (19, 19, 1, 92, 43, 48), (20, 20, 2, 37, 11, 21);
 
+-- Default Admin User (password: admin123 - BCrypt hashed)
+INSERT INTO admins (admin_id, username, password_hash, full_name, email, role) VALUES
+(1, 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'System Administrator', 'admin@ishm.gov.in', 'super_admin');
+
 -- Reset Sequences
 SELECT setval('states_state_id_seq', (SELECT MAX(state_id) FROM states));
 SELECT setval('districts_district_id_seq', (SELECT MAX(district_id) FROM districts));
@@ -253,3 +270,4 @@ SELECT setval('farmers_farmer_id_seq', (SELECT MAX(farmer_id) FROM farmers));
 SELECT setval('farms_farm_id_seq', (SELECT MAX(farm_id) FROM farms));
 SELECT setval('soil_tests_test_id_seq', (SELECT MAX(test_id) FROM soil_tests));
 SELECT setval('fertilizer_recommendations_rec_id_seq', (SELECT MAX(rec_id) FROM fertilizer_recommendations));
+SELECT setval('admins_admin_id_seq', (SELECT MAX(admin_id) FROM admins));

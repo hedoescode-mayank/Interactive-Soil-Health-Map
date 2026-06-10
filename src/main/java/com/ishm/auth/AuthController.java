@@ -1,5 +1,6 @@
 package com.ishm.auth;
 
+import com.ishm.admin.AdminService;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.security.token.generator.TokenGenerator;
@@ -20,6 +21,9 @@ public class AuthController {
 
     @Inject
     AuthService authService;
+
+    @Inject
+    AdminService adminService;
 
     @Inject
     TokenGenerator tokenGenerator;
@@ -96,6 +100,59 @@ public class AuthController {
         } catch (SQLException e) {
             LOG.error("Login error", e);
             return HttpResponse.serverError(Map.of("error", "Login failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Admin login endpoint - authenticates against admins table
+     * Returns JWT with role=admin claim
+     */
+    @Post("/admin/login")
+    public HttpResponse<Map<String, Object>> adminLogin(@Body @Valid LoginRequest request) {
+        LOG.info("Admin login attempt for user: {}", request.getUsername());
+        try {
+            Optional<AdminService.AdminContext> adminOpt = adminService.authenticateAdmin(
+                    request.getUsername(), request.getPassword());
+
+            if (adminOpt.isPresent()) {
+                AdminService.AdminContext admin = adminOpt.get();
+
+                // Generate JWT token with admin role
+                Map<String, Object> claims = new HashMap<>();
+                claims.put("sub", admin.username);
+                claims.put("adminId", admin.adminId);
+                claims.put("role", admin.role);
+                claims.put("roles", List.of("ROLE_ADMIN"));
+
+                Optional<String> token = tokenGenerator.generateToken(claims);
+
+                if (token.isPresent()) {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("token", token.get());
+                    response.put("admin", Map.of(
+                            "id", admin.adminId,
+                            "username", admin.username,
+                            "name", admin.fullName,
+                            "email", admin.email != null ? admin.email : "",
+                            "role", admin.role
+                    ));
+
+                    LOG.info("Admin {} logged in successfully", admin.username);
+                    return HttpResponse.ok(response);
+                }
+            }
+
+            LOG.warn("Admin login failed for user: {}", request.getUsername());
+            return HttpResponse.unauthorized().body(Map.of(
+                    "success", false,
+                    "error", "Invalid admin credentials"));
+
+        } catch (SQLException e) {
+            LOG.error("Admin login error", e);
+            return HttpResponse.serverError(Map.of(
+                    "success", false,
+                    "error", "Login failed: " + e.getMessage()));
         }
     }
 

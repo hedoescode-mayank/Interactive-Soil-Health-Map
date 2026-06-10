@@ -5,6 +5,7 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,9 @@ class DataInitializer {
             } else {
                 LOG.info("Database schema already exists");
             }
+
+            // Ensure admins table exists (added for admin backend)
+            ensureAdminsTable(conn);
         }
     }
 
@@ -169,7 +173,33 @@ class DataInitializer {
             }
         }
 
+        // Also create admins table
+        ensureAdminsTable(conn);
+
         LOG.info("Database schema created successfully");
+    }
+
+    /**
+     * Ensure the admins table exists for admin portal backend
+     */
+    private void ensureAdminsTable(Connection conn) throws SQLException {
+        String createAdmins = """
+            CREATE TABLE IF NOT EXISTS admins (
+                admin_id SERIAL PRIMARY KEY,
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                full_name VARCHAR(150) NOT NULL,
+                email VARCHAR(200),
+                role VARCHAR(50) DEFAULT 'admin',
+                is_active BOOLEAN DEFAULT true,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login TIMESTAMP
+            )
+            """;
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(createAdmins);
+        }
+        LOG.info("Admins table ensured");
     }
 
     private void loadSampleDataIfEmpty() throws SQLException {
@@ -185,6 +215,34 @@ class DataInitializer {
                 } else {
                     LOG.info("Data already exists in database");
                 }
+            }
+
+            // Always ensure default admin exists
+            seedDefaultAdmin(conn);
+        }
+    }
+
+    /**
+     * Seed a default admin user if none exists
+     */
+    private void seedDefaultAdmin(Connection conn) throws SQLException {
+        try (PreparedStatement check = conn.prepareStatement("SELECT COUNT(*) FROM admins")) {
+            ResultSet rs = check.executeQuery();
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                String hash = BCrypt.hashpw("admin123", BCrypt.gensalt());
+                try (PreparedStatement insert = conn.prepareStatement(
+                        "INSERT INTO admins (username, password_hash, full_name, email, role) VALUES (?, ?, ?, ?, ?)")) {
+                    insert.setString(1, "admin");
+                    insert.setString(2, hash);
+                    insert.setString(3, "System Administrator");
+                    insert.setString(4, "admin@ishm.gov.in");
+                    insert.setString(5, "super_admin");
+                    insert.executeUpdate();
+                    LOG.info("Default admin user created (username: admin, password: admin123)");
+                }
+            } else {
+                LOG.info("Admin users already exist, skipping seed");
             }
         }
     }

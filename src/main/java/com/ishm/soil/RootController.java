@@ -50,6 +50,18 @@ public class RootController {
     }
 
     /**
+     * Admin portal routes
+     */
+    @Get("/admin")
+    public HttpResponse<?> admin() {
+        return HttpResponse.redirect(URI.create("/admin.html"));
+    }
+
+    @Get("/admin/dashboard")
+    public HttpResponse<?> adminDashboard() {
+        return HttpResponse.redirect(URI.create("/admin.html"));
+    }
+    /**
      * Health check endpoint
      */
     @Get("/health")
