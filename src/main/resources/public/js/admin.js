@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdminMobileMenu();
     checkAdminSession();
     initSearchListeners();
+    console.log("Admin Portal Initialized successfully.");
 });
 
 // ===== Theme Management =====
