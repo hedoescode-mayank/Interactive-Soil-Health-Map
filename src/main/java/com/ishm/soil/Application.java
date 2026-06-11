@@ -20,7 +20,9 @@ public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
+        LOG.info("=================================================");
         LOG.info("Starting Interactive Soil Health Map Application...");
+        LOG.info("=================================================");
 
         ApplicationContext context = Micronaut.run(Application.class, args);
 
