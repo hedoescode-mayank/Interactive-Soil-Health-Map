@@ -58,6 +58,8 @@ public class AdminController {
             @QueryValue Optional<Integer> size,
             @QueryValue Optional<String> search) {
         try {
+            LOG.info("Request to list farmers: page={}, size={}, search={}", 
+                    page.orElse(1), size.orElse(20), search.orElse("none"));
             Map<String, Object> result = adminService.listFarmers(
                     page.orElse(1),
                     size.orElse(20),
@@ -96,12 +98,14 @@ public class AdminController {
     @Put("/farmers/{id}")
     public HttpResponse<Map<String, Object>> updateFarmer(@PathVariable int id, @Body Map<String, Object> body) {
         try {
+            LOG.info("Request to update farmer {}: {}", id, body);
             String fullName = body.containsKey("fullName") ? (String) body.get("fullName") : null;
             String phone = body.containsKey("phone") ? (String) body.get("phone") : null;
             Boolean isActive = body.containsKey("isActive") ? (Boolean) body.get("isActive") : null;
 
             boolean success = adminService.updateFarmer(id, fullName, phone, isActive);
             if (success) {
+                LOG.info("Successfully updated farmer {}", id);
                 return HttpResponse.ok(Map.of("success", true, "message", "Farmer updated successfully"));
             }
             return HttpResponse.badRequest(Map.of("success", false, "error", "No changes made or farmer not found"));
@@ -117,8 +121,10 @@ public class AdminController {
     @Delete("/farmers/{id}")
     public HttpResponse<Map<String, Object>> deactivateFarmer(@PathVariable int id) {
         try {
+            LOG.info("Request to deactivate farmer {}", id);
             boolean success = adminService.deactivateFarmer(id);
             if (success) {
+                LOG.info("Successfully deactivated farmer {}", id);
                 return HttpResponse.ok(Map.of("success", true, "message", "Farmer deactivated successfully"));
             }
             return HttpResponse.notFound(Map.of("success", false, "error", "Farmer not found"));

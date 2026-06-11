@@ -20,7 +20,9 @@ public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {
+        LOG.info("=================================================");
         LOG.info("Starting Interactive Soil Health Map Application...");
+        LOG.info("=================================================");
 
         ApplicationContext context = Micronaut.run(Application.class, args);
 
@@ -223,7 +225,12 @@ class DataInitializer {
     }
 
     /**
-     * Seed a default admin user if none exists
+     * Seed a default admin user if none exists in the database.
+     * The default credentials created are admin / admin123.
+     * The password is encrypted using BCrypt hashing before storing.
+     * 
+     * @param conn the active database connection
+     * @throws SQLException if a database access error occurs
      */
     private void seedDefaultAdmin(Connection conn) throws SQLException {
         try (PreparedStatement check = conn.prepareStatement("SELECT COUNT(*) FROM admins")) {
