@@ -225,7 +225,12 @@ class DataInitializer {
     }
 
     /**
-     * Seed a default admin user if none exists
+     * Seed a default admin user if none exists in the database.
+     * The default credentials created are admin / admin123.
+     * The password is encrypted using BCrypt hashing before storing.
+     * 
+     * @param conn the active database connection
+     * @throws SQLException if a database access error occurs
      */
     private void seedDefaultAdmin(Connection conn) throws SQLException {
         try (PreparedStatement check = conn.prepareStatement("SELECT COUNT(*) FROM admins")) {
