@@ -58,6 +58,8 @@ public class AdminController {
             @QueryValue Optional<Integer> size,
             @QueryValue Optional<String> search) {
         try {
+            LOG.info("Request to list farmers: page={}, size={}, search={}", 
+                    page.orElse(1), size.orElse(20), search.orElse("none"));
             Map<String, Object> result = adminService.listFarmers(
                     page.orElse(1),
                     size.orElse(20),
