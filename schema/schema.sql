@@ -29,6 +29,9 @@ CREATE TABLE districts (
     CONSTRAINT uq_district_name_state UNIQUE (name, state_id)
 );
 
+-- Spatial index for high-performance geographic queries using PostGIS
+CREATE INDEX idx_districts_spatial_geom ON districts USING GIST(geom);
+
 -- Farmers Table (Main Entity)
 CREATE TABLE farmers (
     farmer_id SERIAL PRIMARY KEY,
