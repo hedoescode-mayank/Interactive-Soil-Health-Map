@@ -124,6 +124,14 @@ COMMENT ON TABLE farms IS 'Farm locations, area, and link to district boundaries
 COMMENT ON COLUMN farms.area_hectares IS 'Farm size in hectares';
 COMMENT ON TABLE soil_tests IS 'Historical soil health report cards';
 
+-- Performance Optimization Indexes
+CREATE INDEX idx_districts_state_id ON districts(state_id);
+CREATE INDEX idx_farms_farmer_id ON farms(farmer_id);
+CREATE INDEX idx_farms_district_id ON farms(district_id);
+CREATE INDEX idx_soil_tests_farm_id ON soil_tests(farm_id);
+CREATE INDEX idx_soil_tests_test_date ON soil_tests(test_date DESC);
+CREATE INDEX idx_fertilizer_recommendations_test_id ON fertilizer_recommendations(test_id);
+
 -- ========================================
 -- 2. PL/pgSQL: FUNCTIONS, PROCEDURES, TRIGGERS, CURSORS
 -- ========================================
