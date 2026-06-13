@@ -42,7 +42,8 @@ CREATE TABLE farmers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP,
-    is_active BOOLEAN DEFAULT true
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT chk_phone_format CHECK (phone IS NULL OR phone ~ '^\d{10}$')
 );
 
 -- Farms Table (4NF: Handles multi-valued farms per farmer)
@@ -54,7 +55,8 @@ CREATE TABLE farms (
     area_hectares DECIMAL(10,2) DEFAULT 1.0,
     CONSTRAINT fk_farm_farmer FOREIGN KEY (farmer_id) REFERENCES farmers(farmer_id) ON DELETE CASCADE,
     CONSTRAINT fk_farm_district FOREIGN KEY (district_id) REFERENCES districts(district_id),
-    CONSTRAINT chk_postal_code CHECK (postal_code ~ '^\d{6}$')
+    CONSTRAINT chk_postal_code CHECK (postal_code ~ '^\d{6}$'),
+    CONSTRAINT chk_area_hectares CHECK (area_hectares > 0)
 );
 
 -- Soil Tests Table (History of soil health)
