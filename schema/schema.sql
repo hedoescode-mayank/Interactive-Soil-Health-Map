@@ -224,6 +224,22 @@ BEGIN
 END;
 $$;
 
+-- Procedure: Run ANALYZE on all key tables to optimize query plans
+CREATE OR REPLACE PROCEDURE sp_maintenance_analyze_tables()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE 'Starting database maintenance: analyzing tables...';
+    ANALYZE states;
+    ANALYZE districts;
+    ANALYZE farmers;
+    ANALYZE farms;
+    ANALYZE soil_tests;
+    ANALYZE fertilizer_recommendations;
+    RAISE NOTICE 'Database maintenance completed successfully.';
+END;
+$$;
+
 -- ========================================
 -- 3. VIEWS (Joins & Aggregates)
 -- ========================================
