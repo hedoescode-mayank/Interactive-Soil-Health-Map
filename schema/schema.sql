@@ -256,6 +256,25 @@ LEFT JOIN soil_tests st ON fm.farm_id = st.farm_id
 GROUP BY d.name
 HAVING COUNT(fm.farm_id) >= 0;
 
+-- View: District Spatial & Soil Density Stats (uses PostGIS ST_Area)
+CREATE OR REPLACE VIEW vw_district_spatial_stats AS
+SELECT 
+    d.district_id,
+    d.name AS district_name,
+    ST_Area(d.geom::geography) / 1000000.0 AS area_sq_km,
+    COUNT(fm.farm_id) AS total_farms,
+    CASE 
+        WHEN ST_Area(d.geom::geography) > 0 THEN COUNT(fm.farm_id) / (ST_Area(d.geom::geography) / 1000000.0)
+        ELSE 0 
+    END AS farm_density_per_sq_km,
+    ROUND(AVG(st.nitrogen_val), 2) as avg_nitrogen,
+    ROUND(AVG(st.phosphorus_val), 2) as avg_phosphorus,
+    ROUND(AVG(st.potassium_val), 2) as avg_potassium
+FROM districts d
+LEFT JOIN farms fm ON d.district_id = fm.district_id
+LEFT JOIN soil_tests st ON fm.farm_id = st.farm_id
+GROUP BY d.district_id, d.name, d.geom;
+
 -- ========================================
 -- 4. DML: SAMPLE DATA (20+ FARMERS)
 -- ========================================
