@@ -112,6 +112,15 @@ CREATE TABLE admins (
     last_login TIMESTAMP
 );
 
+-- Table & Column Documentation Comments
+COMMENT ON TABLE states IS 'Master list of states in India';
+COMMENT ON TABLE districts IS 'Spatial boundaries of districts using PostGIS MultiPolygon geometries';
+COMMENT ON COLUMN districts.geom IS 'Spatial geometry boundary using EPSG:4326 (WGS84)';
+COMMENT ON TABLE farmers IS 'User accounts and login details for registered farmers';
+COMMENT ON TABLE farms IS 'Farm locations, area, and link to district boundaries';
+COMMENT ON COLUMN farms.area_hectares IS 'Farm size in hectares';
+COMMENT ON TABLE soil_tests IS 'Historical soil health report cards';
+
 -- ========================================
 -- 2. PL/pgSQL: FUNCTIONS, PROCEDURES, TRIGGERS, CURSORS
 -- ========================================
