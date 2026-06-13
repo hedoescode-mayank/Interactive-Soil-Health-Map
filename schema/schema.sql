@@ -40,6 +40,7 @@ CREATE TABLE farmers (
     full_name VARCHAR(150) NOT NULL,
     phone VARCHAR(15),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP,
     is_active BOOLEAN DEFAULT true
 );
@@ -133,6 +134,20 @@ BEGIN
     RETURN ROUND(((target_val - current_val) * factor), 2);
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Trigger Function: Automatically Update updated_at Timestamp
+CREATE OR REPLACE FUNCTION trg_func_update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger: Before Update on Farmers (Update Timestamp)
+CREATE TRIGGER before_farmer_update_timestamp
+BEFORE UPDATE ON farmers
+FOR EACH ROW EXECUTE FUNCTION trg_func_update_timestamp();
 
 -- Trigger Function: Log Farmer Updates
 CREATE OR REPLACE FUNCTION trg_func_audit_farmer()
