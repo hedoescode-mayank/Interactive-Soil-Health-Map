@@ -29,6 +29,9 @@ CREATE TABLE districts (
     CONSTRAINT uq_district_name_state UNIQUE (name, state_id)
 );
 
+-- Spatial index for high-performance geographic queries using PostGIS
+CREATE INDEX idx_districts_spatial_geom ON districts USING GIST(geom);
+
 -- Farmers Table (Main Entity)
 CREATE TABLE farmers (
     farmer_id SERIAL PRIMARY KEY,
@@ -37,8 +40,10 @@ CREATE TABLE farmers (
     full_name VARCHAR(150) NOT NULL,
     phone VARCHAR(15),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP,
-    is_active BOOLEAN DEFAULT true
+    is_active BOOLEAN DEFAULT true,
+    CONSTRAINT chk_phone_format CHECK (phone IS NULL OR phone ~ '^\d{10}$')
 );
 
 -- Farms Table (4NF: Handles multi-valued farms per farmer)
@@ -50,7 +55,8 @@ CREATE TABLE farms (
     area_hectares DECIMAL(10,2) DEFAULT 1.0,
     CONSTRAINT fk_farm_farmer FOREIGN KEY (farmer_id) REFERENCES farmers(farmer_id) ON DELETE CASCADE,
     CONSTRAINT fk_farm_district FOREIGN KEY (district_id) REFERENCES districts(district_id),
-    CONSTRAINT chk_postal_code CHECK (postal_code ~ '^\d{6}$')
+    CONSTRAINT chk_postal_code CHECK (postal_code ~ '^\d{6}$'),
+    CONSTRAINT chk_area_hectares CHECK (area_hectares > 0)
 );
 
 -- Soil Tests Table (History of soil health)
@@ -109,6 +115,23 @@ CREATE TABLE admins (
     last_login TIMESTAMP
 );
 
+-- Table & Column Documentation Comments
+COMMENT ON TABLE states IS 'Master list of states in India';
+COMMENT ON TABLE districts IS 'Spatial boundaries of districts using PostGIS MultiPolygon geometries';
+COMMENT ON COLUMN districts.geom IS 'Spatial geometry boundary using EPSG:4326 (WGS84)';
+COMMENT ON TABLE farmers IS 'User accounts and login details for registered farmers';
+COMMENT ON TABLE farms IS 'Farm locations, area, and link to district boundaries';
+COMMENT ON COLUMN farms.area_hectares IS 'Farm size in hectares';
+COMMENT ON TABLE soil_tests IS 'Historical soil health report cards';
+
+-- Performance Optimization Indexes
+CREATE INDEX idx_districts_state_id ON districts(state_id);
+CREATE INDEX idx_farms_farmer_id ON farms(farmer_id);
+CREATE INDEX idx_farms_district_id ON farms(district_id);
+CREATE INDEX idx_soil_tests_farm_id ON soil_tests(farm_id);
+CREATE INDEX idx_soil_tests_test_date ON soil_tests(test_date DESC);
+CREATE INDEX idx_fertilizer_recommendations_test_id ON fertilizer_recommendations(test_id);
+
 -- ========================================
 -- 2. PL/pgSQL: FUNCTIONS, PROCEDURES, TRIGGERS, CURSORS
 -- ========================================
@@ -121,6 +144,35 @@ BEGIN
     RETURN ROUND(((target_val - current_val) * factor), 2);
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
+
+-- Function: Find district_id containing the specified latitude and longitude (PostGIS ST_Contains)
+CREATE OR REPLACE FUNCTION fn_find_district_by_coords(p_lat NUMERIC, p_lng NUMERIC)
+RETURNS INT AS $$
+DECLARE
+    v_district_id INT;
+BEGIN
+    SELECT district_id INTO v_district_id
+    FROM districts
+    WHERE ST_Contains(geom, ST_SetSRID(ST_Point(p_lng, p_lat), 4326))
+    LIMIT 1;
+    
+    RETURN v_district_id;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Trigger Function: Automatically Update updated_at Timestamp
+CREATE OR REPLACE FUNCTION trg_func_update_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger: Before Update on Farmers (Update Timestamp)
+CREATE TRIGGER before_farmer_update_timestamp
+BEFORE UPDATE ON farmers
+FOR EACH ROW EXECUTE FUNCTION trg_func_update_timestamp();
 
 -- Trigger Function: Log Farmer Updates
 CREATE OR REPLACE FUNCTION trg_func_audit_farmer()
@@ -180,6 +232,22 @@ BEGIN
 END;
 $$;
 
+-- Procedure: Run ANALYZE on all key tables to optimize query plans
+CREATE OR REPLACE PROCEDURE sp_maintenance_analyze_tables()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE 'Starting database maintenance: analyzing tables...';
+    ANALYZE states;
+    ANALYZE districts;
+    ANALYZE farmers;
+    ANALYZE farms;
+    ANALYZE soil_tests;
+    ANALYZE fertilizer_recommendations;
+    RAISE NOTICE 'Database maintenance completed successfully.';
+END;
+$$;
+
 -- ========================================
 -- 3. VIEWS (Joins & Aggregates)
 -- ========================================
@@ -213,6 +281,25 @@ LEFT JOIN farms fm ON d.district_id = fm.district_id
 LEFT JOIN soil_tests st ON fm.farm_id = st.farm_id
 GROUP BY d.name
 HAVING COUNT(fm.farm_id) >= 0;
+
+-- View: District Spatial & Soil Density Stats (uses PostGIS ST_Area)
+CREATE OR REPLACE VIEW vw_district_spatial_stats AS
+SELECT 
+    d.district_id,
+    d.name AS district_name,
+    ST_Area(d.geom::geography) / 1000000.0 AS area_sq_km,
+    COUNT(fm.farm_id) AS total_farms,
+    CASE 
+        WHEN ST_Area(d.geom::geography) > 0 THEN COUNT(fm.farm_id) / (ST_Area(d.geom::geography) / 1000000.0)
+        ELSE 0 
+    END AS farm_density_per_sq_km,
+    ROUND(AVG(st.nitrogen_val), 2) as avg_nitrogen,
+    ROUND(AVG(st.phosphorus_val), 2) as avg_phosphorus,
+    ROUND(AVG(st.potassium_val), 2) as avg_potassium
+FROM districts d
+LEFT JOIN farms fm ON d.district_id = fm.district_id
+LEFT JOIN soil_tests st ON fm.farm_id = st.farm_id
+GROUP BY d.district_id, d.name, d.geom;
 
 -- ========================================
 -- 4. DML: SAMPLE DATA (20+ FARMERS)
