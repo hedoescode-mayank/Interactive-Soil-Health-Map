@@ -135,6 +135,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
+-- Function: Find district_id containing the specified latitude and longitude (PostGIS ST_Contains)
+CREATE OR REPLACE FUNCTION fn_find_district_by_coords(p_lat NUMERIC, p_lng NUMERIC)
+RETURNS INT AS $$
+DECLARE
+    v_district_id INT;
+BEGIN
+    SELECT district_id INTO v_district_id
+    FROM districts
+    WHERE ST_Contains(geom, ST_SetSRID(ST_Point(p_lng, p_lat), 4326))
+    LIMIT 1;
+    
+    RETURN v_district_id;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
 -- Trigger Function: Automatically Update updated_at Timestamp
 CREATE OR REPLACE FUNCTION trg_func_update_timestamp()
 RETURNS TRIGGER AS $$
