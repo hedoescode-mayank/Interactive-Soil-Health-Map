@@ -8,6 +8,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.generator.TokenGenerator;
 import jakarta.inject.Inject;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.slf4j.Logger;
@@ -262,6 +263,7 @@ public class AuthController {
         @NotBlank
         private String fullName;
         
+        @Nullable
         @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits")
         private String phone;
 
@@ -274,7 +276,7 @@ public class AuthController {
         public String getFullName() { return fullName; }
         public void setFullName(String fullName) { this.fullName = fullName; }
         public String getPhone() { return phone; }
-        public void setPhone(String phone) { this.phone = phone; }
+        public void setPhone(String phone) { this.phone = (phone != null && phone.isBlank()) ? null : phone; }
     }
 
     @Introspected
