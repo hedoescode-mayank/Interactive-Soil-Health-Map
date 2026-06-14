@@ -623,11 +623,12 @@
     // Handle Register
     async function handleRegister(e) {
         e.preventDefault();
-        const fullName = document.getElementById('regFullName').value;
-        const username = document.getElementById('regUsername').value;
+        const fullName = document.getElementById('regFullName').value.trim();
+        const username = document.getElementById('regUsername').value.trim();
         const password = document.getElementById('regPassword').value;
-        const postalCode = document.getElementById('regPostalCode').value;
-        const phone = document.getElementById('regPhone').value;
+        const postalCode = document.getElementById('regPostalCode').value.trim();
+        const rawPhone = document.getElementById('regPhone').value.trim();
+        const phone = rawPhone.length === 10 ? rawPhone : null;
 
         try {
             const response = await fetch('/api/auth/register', {

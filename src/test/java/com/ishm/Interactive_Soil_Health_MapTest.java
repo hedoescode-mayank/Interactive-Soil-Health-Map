@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 
 import jakarta.inject.Inject;
 
-@MicronautTest
+@MicronautTest(environments = "test", properties = "micronaut.server.port=-1")
 class Interactive_Soil_Health_MapTest {
 
     @Inject
