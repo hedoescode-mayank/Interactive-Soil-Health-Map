@@ -340,10 +340,7 @@ INSERT INTO soil_tests (test_id, farm_id, nitrogen_val, phosphorus_val, potassiu
 -- Recommendations for Farmers
 INSERT INTO fertilizer_recommendations (rec_id, test_id, crop_id, urea_dose, dap_dose, mop_dose) VALUES
 (1, 1, 1, 50, 20, 30), (2, 2, 2, 80, 35, 40), (3, 3, 3, 40, 15, 25), (4, 4, 1, 65, 25, 35),
-(5, 5, 2, 55, 20, 30), (6, 6, 3, 45, 18, 28), (7, 7, 1, 95, 45, 50), (8, 8, 2, 35, 10, 20),
-(9, 9, 3, 52, 22, 32), (10, 10, 1, 62, 24, 34), (11, 11, 2, 42, 12, 22), (12, 12, 3, 82, 36, 42),
-(13, 13, 1, 48, 19, 29), (14, 14, 2, 68, 28, 38), (15, 15, 3, 38, 14, 24), (16, 16, 1, 64, 23, 33),
-(17, 17, 2, 53, 21, 31), (18, 18, 3, 43, 17, 27), (19, 19, 1, 92, 43, 48), (20, 20, 2, 37, 11, 21);
+(5, 5, 2, 55, 20, 30), (6, 21, 3, 45, 18, 28);
 
 -- Default Admin User (password: admin123 - BCrypt hashed)
 INSERT INTO admins (admin_id, username, password_hash, full_name, email, role) VALUES
