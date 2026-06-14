@@ -320,12 +320,12 @@ INSERT INTO crops (crop_id, crop_name, season) VALUES
 
 -- Inserting 22 Farmers
 INSERT INTO farmers (farmer_id, username, password_hash, full_name, phone) VALUES
-(1, 'farmer1', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Rajesh Kumar', '9876543001'),
-(2, 'farmer2', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Amit Singh', '9876543002'),
-(3, 'farmer3', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Sita Devi', '9876543003'),
-(4, 'farmer4', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Vikram Yadav', '9876543004'),
-(5, 'farmer5', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Priya Sharma', '9876543005'),
-(21, 'farmer21', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Puneet Singh', '9876543021');
+(1, 'farmer1', '$2a$10$fV27027/2HwO56eC363pB.eO/f3n6T.y5U5zM/XhHwW0gM4Q4hV2e', 'Rajesh Kumar', '9876543001'),
+(2, 'farmer2', '$2a$10$fV27027/2HwO56eC363pB.eO/f3n6T.y5U5zM/XhHwW0gM4Q4hV2e', 'Amit Singh', '9876543002'),
+(3, 'farmer3', '$2a$10$fV27027/2HwO56eC363pB.eO/f3n6T.y5U5zM/XhHwW0gM4Q4hV2e', 'Sita Devi', '9876543003'),
+(4, 'farmer4', '$2a$10$fV27027/2HwO56eC363pB.eO/f3n6T.y5U5zM/XhHwW0gM4Q4hV2e', 'Vikram Yadav', '9876543004'),
+(5, 'farmer5', '$2a$10$fV27027/2HwO56eC363pB.eO/f3n6T.y5U5zM/XhHwW0gM4Q4hV2e', 'Priya Sharma', '9876543005'),
+(21, 'farmer21', '$2a$10$fV27027/2HwO56eC363pB.eO/f3n6T.y5U5zM/XhHwW0gM4Q4hV2e', 'Puneet Singh', '9876543021');
 
 -- Farms for Farmers
 INSERT INTO farms (farm_id, farmer_id, district_id, postal_code, area_hectares) VALUES
