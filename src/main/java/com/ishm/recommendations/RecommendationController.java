@@ -2,6 +2,8 @@ package com.ishm.recommendations;
 
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +14,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 
+@Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/recommendations")
 public class RecommendationController {
 
@@ -54,6 +57,7 @@ public class RecommendationController {
     /**
      * Save recommendation for user
      */
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Post("/save")
     public HttpResponse<Map<String, Object>> saveRecommendation(@Body Map<String, Object> recommendation) {
         try (Connection conn = dataSource.getConnection()) {

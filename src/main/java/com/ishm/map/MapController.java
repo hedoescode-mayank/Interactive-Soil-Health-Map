@@ -2,6 +2,8 @@ package com.ishm.map;
 
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 
+@Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/map")
 public class MapController {
 
