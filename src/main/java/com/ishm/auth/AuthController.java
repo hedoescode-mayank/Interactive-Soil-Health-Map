@@ -1,6 +1,7 @@
 package com.ishm.auth;
 
 import com.ishm.admin.AdminService;
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.security.annotation.Secured;
@@ -247,6 +248,7 @@ public class AuthController {
     private String classifyK(double val) { return val < 110 ? "Low" : (val <= 280 ? "Medium" : "High"); }
 
     // Request classes
+    @Introspected
     public static class RegistrationRequest {
         @NotBlank @Size(min = 3, max = 50)
         private String username;
@@ -275,6 +277,7 @@ public class AuthController {
         public void setPhone(String phone) { this.phone = phone; }
     }
 
+    @Introspected
     public static class LoginRequest {
         @NotBlank
         private String username;
@@ -287,6 +290,7 @@ public class AuthController {
         public void setPassword(String password) { this.password = password; }
     }
 
+    @Introspected
     public static class UpdatePasswordRequest {
         @NotBlank
         private String oldPassword;

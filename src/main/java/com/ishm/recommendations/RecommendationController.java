@@ -1,5 +1,6 @@
 package com.ishm.recommendations;
 
+import io.micronaut.core.annotation.Introspected;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.security.annotation.Secured;
@@ -68,6 +69,7 @@ public class RecommendationController {
     }
 
     // Request class
+    @Introspected
     public static class RecommendationRequest {
         private String state;
         private String district;
