@@ -4,6 +4,8 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +15,7 @@ import java.util.Map;
 /**
  * Root controller for handling main navigation and page redirects
  */
+@Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/")
 public class RootController {
 
@@ -94,7 +97,7 @@ public class RootController {
     /**
      * Global 404 Not Found handler
      */
-    @Error(status = HttpStatus.NOT_FOUND, global = true)
+    @io.micronaut.http.annotation.Error(status = HttpStatus.NOT_FOUND, global = true)
     public HttpResponse<?> notFound() {
         return HttpResponse.redirect(URI.create("/404.html"));
     }

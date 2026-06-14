@@ -2,6 +2,8 @@ package com.ishm.dash;
 
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import java.sql.*;
 import java.util.*;
 import java.time.LocalDate;
 
+@Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/dashboard")
 public class DashboardController {
 
