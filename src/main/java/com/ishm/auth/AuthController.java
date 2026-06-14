@@ -3,6 +3,8 @@ package com.ishm.auth;
 import com.ishm.admin.AdminService;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.generator.TokenGenerator;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.*;
 
+@Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/auth")
 public class AuthController {
 
@@ -159,6 +162,7 @@ public class AuthController {
     /**
      * Verify token and get farmer details
      */
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Get("/verify")
     public HttpResponse<Map<String, Object>> verifyToken(@Header("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -170,6 +174,7 @@ public class AuthController {
     /**
      * Get specific profile and soil data for logged-in farmer
      */
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Get("/me")
     public HttpResponse<Map<String, Object>> getMe(java.security.Principal principal) {
         try {
@@ -217,6 +222,7 @@ public class AuthController {
         }
     }
     
+    @Secured(SecurityRule.IS_AUTHENTICATED)
     @Put("/update-password")
     public HttpResponse<Map<String, Object>> updatePassword(@Body @Valid UpdatePasswordRequest request, java.security.Principal principal) {
         if (principal == null) {
