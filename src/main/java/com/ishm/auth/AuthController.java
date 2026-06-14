@@ -1,308 +1,295 @@
 package com.ishm.auth;
 
-import com.ishm.admin.AdminService;
-import io.micronaut.core.annotation.Introspected;
-import io.micronaut.http.annotation.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.micronaut.security.token.generator.TokenGenerator;
 import jakarta.inject.Inject;
-import jakarta.annotation.Nullable;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * Auth controller — completely rewritten from scratch.
+ * All endpoints under /api/auth are open (IS_ANONYMOUS).
+ * Token validation happens manually via JwtUtil so we are NOT
+ * relying on Micronaut Security's interceptor at all.
+ */
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/auth")
 public class AuthController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
 
-    @Inject
-    AuthService authService;
+    @Inject AuthService authService;
+    @Inject JwtUtil jwtUtil;
 
-    @Inject
-    AdminService adminService;
+    // ─── Register ─────────────────────────────────────────────────────────────
 
-    @Inject
-    TokenGenerator tokenGenerator;
-
-    @Inject
-    DataSource dataSource;
-
-    /**
-     * Register new farmer with postal code verification
-     */
     @Post("/register")
-    public HttpResponse<Map<String, Object>> register(@Body @Valid RegistrationRequest request) {
-        LOG.info("Registration attempt for user: {}", request.getUsername());
+    public HttpResponse<Map<String, Object>> register(@Body Map<String, Object> body) {
         try {
-            String status = authService.registerFarmer(request);
-            if (!"SUCCESS".equals(status)) {
-                return HttpResponse.badRequest(Map.of("error", status));
+            String username        = str(body, "username");
+            String password        = str(body, "password");
+            String fullName        = str(body, "fullName");
+            String phone           = str(body, "phone");
+            String postalCode      = str(body, "postalCode");
+            String securityQ       = str(body, "securityQuestion");
+            String securityA       = str(body, "securityAnswer");
+
+            AuthService.RegisterResult result = authService.registerFarmer(
+                    username, password, fullName, phone, postalCode, securityQ, securityA);
+
+            if (!result.success()) {
+                return bad(result.error());
             }
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Registration successful! You can now login.");
-            LOG.info("Registration successful for user: {}", request.getUsername());
-            return HttpResponse.ok(response);
+            LOG.info("Registered new farmer: {}", username);
+            return ok(Map.of("success", true, "message", "Registration successful! Please login."));
 
         } catch (SQLException e) {
-            LOG.error("Registration error", e);
-            return HttpResponse.serverError(Map.of("error", "Database error during registration: " + e.getMessage()));
+            LOG.error("Register DB error", e);
+            return err("Database error: " + e.getMessage());
         }
     }
 
-    /**
-     * Login with username and password
-     */
+    // ─── Login ────────────────────────────────────────────────────────────────
+
     @Post("/login")
-    public HttpResponse<Map<String, Object>> login(@Body @Valid LoginRequest request) {
-        LOG.info("Login attempt for user: {}", request.getUsername());
+    public HttpResponse<Map<String, Object>> login(@Body Map<String, Object> body) {
         try {
-            Optional<AuthService.UserContext> userOpt = authService.authenticate(request.getUsername(), request.getPassword());
+            String username = str(body, "username");
+            String password = str(body, "password");
 
-            if (userOpt.isPresent()) {
-                AuthService.UserContext user = userOpt.get();
+            if (username == null || username.isBlank()) return bad("Username is required");
+            if (password == null || password.isBlank()) return bad("Password is required");
 
-                // Generate JWT token
-                Map<String, Object> claims = new HashMap<>();
-                claims.put("sub", user.username);
-                claims.put("farmerId", user.farmerId);
-                claims.put("district", user.district);
-                claims.put("state", user.state);
-
-                Optional<String> token = tokenGenerator.generateToken(claims);
-
-                if (token.isPresent()) {
-                    Map<String, Object> response = new HashMap<>();
-                    response.put("success", true);
-                    response.put("token", token.get());
-                    response.put("farmer", Map.of(
-                            "id", user.farmerId,
-                            "username", user.username,
-                            "postalCode", user.postalCode,
-                            "district", user.district,
-                            "state", user.state,
-                            "fullName", user.fullName
-                    ));
-
-                    LOG.info("User {} logged in successfully", user.username);
-                    return HttpResponse.ok(response);
-                }
+            Optional<AuthService.UserContext> userOpt = authService.login(username, password);
+            if (userOpt.isEmpty()) {
+                return HttpResponse.<Map<String, Object>>unauthorized()
+                        .body(Map.of("success", false, "error", "Invalid username or password"));
             }
 
-            LOG.warn("Login failed for user: {}", request.getUsername());
-            return HttpResponse.unauthorized().body(Map.of("error", "Invalid username or password"));
+            AuthService.UserContext user = userOpt.get();
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("sub", user.username());
+            claims.put("farmerId", user.farmerId());
+            claims.put("district", user.district());
+            claims.put("state", user.state());
+
+            String token = jwtUtil.generateToken(claims);
+
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("success", true);
+            resp.put("token", token);
+            resp.put("farmer", Map.of(
+                    "id",        user.farmerId(),
+                    "username",  user.username(),
+                    "fullName",  user.fullName(),
+                    "district",  user.district(),
+                    "state",     user.state(),
+                    "postalCode",user.postalCode()
+            ));
+
+            LOG.info("Login success: {}", user.username());
+            return ok(resp);
 
         } catch (SQLException e) {
-            LOG.error("Login error", e);
-            return HttpResponse.serverError(Map.of("error", "Login failed: " + e.getMessage()));
+            LOG.error("Login DB error", e);
+            return err("Login failed: " + e.getMessage());
         }
     }
 
-    /**
-     * Admin login endpoint - authenticates against admins table
-     * Returns JWT with role=admin claim
-     */
-    @Post("/admin/login")
-    public HttpResponse<Map<String, Object>> adminLogin(@Body @Valid LoginRequest request) {
-        LOG.info("Admin login attempt for user: {}", request.getUsername());
+    // ─── Forgot password — step 1: get security question ─────────────────────
+
+    @Post("/forgot/question")
+    public HttpResponse<Map<String, Object>> forgotQuestion(@Body Map<String, Object> body) {
         try {
-            Optional<AdminService.AdminContext> adminOpt = adminService.authenticateAdmin(
-                    request.getUsername(), request.getPassword());
+            String username = str(body, "username");
+            if (username == null || username.isBlank()) return bad("Username is required");
 
-            if (adminOpt.isPresent()) {
-                AdminService.AdminContext admin = adminOpt.get();
+            Optional<String> q = authService.getSecurityQuestion(username);
+            if (q.isEmpty()) {
+                // Don't leak whether user exists
+                return ok(Map.of("success", true, "question",
+                        "What is the name of your first pet? (account not found — check username)"));
+            }
+            return ok(Map.of("success", true, "question", q.get()));
 
-                // Generate JWT token with admin role
-                Map<String, Object> claims = new HashMap<>();
-                claims.put("sub", admin.username);
-                claims.put("adminId", admin.adminId);
-                claims.put("role", admin.role);
-                claims.put("roles", List.of("ROLE_ADMIN"));
+        } catch (SQLException e) {
+            LOG.error("Forgot question DB error", e);
+            return err("Error: " + e.getMessage());
+        }
+    }
 
-                Optional<String> token = tokenGenerator.generateToken(claims);
+    // ─── Forgot password — step 2: verify answer, get reset token ────────────
 
-                if (token.isPresent()) {
-                    Map<String, Object> response = new HashMap<>();
-                    response.put("success", true);
-                    response.put("token", token.get());
-                    response.put("admin", Map.of(
-                            "id", admin.adminId,
-                            "username", admin.username,
-                            "name", admin.fullName,
-                            "email", admin.email != null ? admin.email : "",
-                            "role", admin.role
-                    ));
+    @Post("/forgot/verify")
+    public HttpResponse<Map<String, Object>> forgotVerify(@Body Map<String, Object> body) {
+        try {
+            String username = str(body, "username");
+            String answer   = str(body, "answer");
 
-                    LOG.info("Admin {} logged in successfully", admin.username);
-                    return HttpResponse.ok(response);
-                }
+            if (username == null || username.isBlank()) return bad("Username required");
+            if (answer == null || answer.isBlank())     return bad("Answer required");
+
+            Optional<String> tokenOpt = authService.verifySecurityAnswer(username, answer);
+            if (tokenOpt.isEmpty()) {
+                return HttpResponse.<Map<String, Object>>unauthorized()
+                        .body(Map.of("success", false, "error", "Incorrect answer"));
             }
 
-            LOG.warn("Admin login failed for user: {}", request.getUsername());
-            return HttpResponse.unauthorized().body(Map.of(
-                    "success", false,
-                    "error", "Invalid admin credentials"));
+            return ok(Map.of("success", true, "resetToken", tokenOpt.get(),
+                    "message", "Answer verified. You can now reset your password."));
 
         } catch (SQLException e) {
-            LOG.error("Admin login error", e);
-            return HttpResponse.serverError(Map.of(
-                    "success", false,
-                    "error", "Login failed: " + e.getMessage()));
+            LOG.error("Forgot verify DB error", e);
+            return err("Error: " + e.getMessage());
         }
     }
 
-    /**
-     * Verify token and get farmer details
-     */
-    @Secured(SecurityRule.IS_AUTHENTICATED)
-    @Get("/verify")
-    public HttpResponse<Map<String, Object>> verifyToken(@Header("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return HttpResponse.unauthorized().body(Map.of("error", "No token provided"));
+    // ─── Forgot password — step 3: set new password ──────────────────────────
+
+    @Post("/forgot/reset")
+    public HttpResponse<Map<String, Object>> forgotReset(@Body Map<String, Object> body) {
+        try {
+            String username    = str(body, "username");
+            String resetToken  = str(body, "resetToken");
+            String newPassword = str(body, "newPassword");
+
+            if (newPassword == null || newPassword.length() < 6)
+                return bad("New password must be at least 6 characters");
+
+            boolean ok = authService.resetPassword(username, resetToken, newPassword);
+            if (!ok) {
+                return bad("Reset token is invalid or expired. Please start over.");
+            }
+
+            LOG.info("Password reset for: {}", username);
+            return ok(Map.of("success", true, "message", "Password reset successfully! Please login."));
+
+        } catch (SQLException e) {
+            LOG.error("Reset password DB error", e);
+            return err("Error: " + e.getMessage());
         }
-        return HttpResponse.ok(Map.of("valid", true));
     }
 
-    /**
-     * Get specific profile and soil data for logged-in farmer
-     */
-    @Secured(SecurityRule.IS_AUTHENTICATED)
+    // ─── Change password (logged in) ──────────────────────────────────────────
+
+    @Put("/change-password")
+    public HttpResponse<Map<String, Object>> changePassword(
+            HttpRequest<?> request, @Body Map<String, Object> body) {
+        try {
+            String username = requireAuth(request);
+            if (username == null) return unauthorized();
+
+            String oldPassword = str(body, "oldPassword");
+            String newPassword = str(body, "newPassword");
+
+            if (oldPassword == null || oldPassword.isBlank()) return bad("Old password required");
+            if (newPassword == null || newPassword.length() < 6) return bad("New password must be at least 6 characters");
+
+            boolean ok = authService.changePassword(username, oldPassword, newPassword);
+            if (!ok) return bad("Current password is incorrect");
+
+            return ok(Map.of("success", true, "message", "Password changed successfully"));
+
+        } catch (SQLException e) {
+            LOG.error("Change password DB error", e);
+            return err("Error: " + e.getMessage());
+        }
+    }
+
+    // ─── Get my profile ───────────────────────────────────────────────────────
+
     @Get("/me")
-    public HttpResponse<Map<String, Object>> getMe(java.security.Principal principal) {
+    public HttpResponse<Map<String, Object>> getMe(HttpRequest<?> request) {
         try {
-            if (principal == null || principal.getName() == null) {
-                return HttpResponse.unauthorized();
-            }
-            
-            String query = "SELECT * FROM vw_farmer_soil_data WHERE username = ?";
+            String username = requireAuth(request);
+            if (username == null) return unauthorized();
 
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
+            Optional<AuthService.FarmerProfile> profile = authService.getProfile(username);
+            if (profile.isEmpty()) return HttpResponse.notFound(Map.of("error", "Profile not found"));
 
-                stmt.setString(1, principal.getName());
-                ResultSet rs = stmt.executeQuery();
+            AuthService.FarmerProfile p = profile.get();
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("id", p.farmerId());
+            resp.put("username", p.username());
+            resp.put("full_name", p.fullName());
+            resp.put("phone", p.phone());
+            resp.put("postal_code", p.postalCode());
+            resp.put("district_name", p.district());
+            resp.put("state_name", p.state());
+            resp.put("nitrogen_avg", p.nitrogen());
+            resp.put("phosphorus_avg", p.phosphorus());
+            resp.put("potassium_avg", p.potassium());
+            resp.put("ph_avg", p.ph());
+            resp.put("nitrogen_status", classifyN(p.nitrogen()));
+            resp.put("phosphorus_status", classifyP(p.phosphorus()));
+            resp.put("potassium_status", classifyK(p.potassium()));
 
-                if (rs.next()) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("id", rs.getLong("farmer_id"));
-                    data.put("username", rs.getString("username"));
-                    data.put("district_name", rs.getString("district"));
-                    data.put("state_name", rs.getString("state"));
-                    data.put("postal_code", rs.getString("postal_code"));
-                    data.put("full_name", rs.getString("full_name"));
-                    
-                    double n = rs.getObject("nitrogen_val") != null ? rs.getDouble("nitrogen_val") : 0.0;
-                    double p = rs.getObject("phosphorus_val") != null ? rs.getDouble("phosphorus_val") : 0.0;
-                    double k = rs.getObject("potassium_val") != null ? rs.getDouble("potassium_val") : 0.0;
-                    
-                    data.put("nitrogen_avg", n);
-                    data.put("phosphorus_avg", p);
-                    data.put("potassium_avg", k);
-                    data.put("ph_avg", rs.getObject("ph_val") != null ? rs.getDouble("ph_val") : 0.0);
-                    
-                    data.put("nitrogen_status", classifyN(n));
-                    data.put("phosphorus_status", classifyP(p));
-                    data.put("potassium_status", classifyK(k));
-                    
-                    return HttpResponse.ok(data);
-                }
-            }
-            return HttpResponse.notFound(Map.of("error", "Farmer not found"));
-        } catch (Exception e) {
-            LOG.error("Error fetching farmer data", e);
-            return HttpResponse.serverError(Map.of("error", "Database error: " + e.getMessage()));
-        }
-    }
-    
-    @Secured(SecurityRule.IS_AUTHENTICATED)
-    @Put("/update-password")
-    public HttpResponse<Map<String, Object>> updatePassword(@Body @Valid UpdatePasswordRequest request, java.security.Principal principal) {
-        if (principal == null) {
-            return HttpResponse.unauthorized();
-        }
-        
-        try {
-            boolean success = authService.updatePassword(principal.getName(), request.getOldPassword(), request.getNewPassword());
-            if (success) {
-                return HttpResponse.ok(Map.of("success", true, "message", "Password updated successfully"));
-            } else {
-                return HttpResponse.badRequest(Map.of("success", false, "error", "Invalid old password"));
-            }
+            return ok(resp);
+
         } catch (SQLException e) {
-            LOG.error("Password update error", e);
-            return HttpResponse.serverError(Map.of("success", false, "error", "Database error: " + e.getMessage()));
+            LOG.error("Get profile DB error", e);
+            return err("Error: " + e.getMessage());
         }
     }
 
-    private String classifyN(double val) { return val < 280 ? "Low" : (val <= 560 ? "Medium" : "High"); }
-    private String classifyP(double val) { return val < 10 ? "Low" : (val <= 25 ? "Medium" : "High"); }
-    private String classifyK(double val) { return val < 110 ? "Low" : (val <= 280 ? "Medium" : "High"); }
+    // ─── Verify token ─────────────────────────────────────────────────────────
 
-    // Request classes
-    @Introspected
-    public static class RegistrationRequest {
-        @NotBlank @Size(min = 3, max = 50)
-        private String username;
-        
-        @NotBlank @Size(min = 6)
-        private String password;
-        
-        @NotBlank @Pattern(regexp = "^[0-9]{6}$", message = "Postal code must be 6 digits")
-        private String postalCode;
-        
-        @NotBlank
-        private String fullName;
-        
-        @Nullable
-        @Pattern(regexp = "^[0-9]{10}$", message = "Phone must be 10 digits")
-        private String phone;
-
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
-        public String getPostalCode() { return postalCode; }
-        public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
-        public String getFullName() { return fullName; }
-        public void setFullName(String fullName) { this.fullName = fullName; }
-        public String getPhone() { return phone; }
-        public void setPhone(String phone) { this.phone = (phone != null && phone.isBlank()) ? null : phone; }
+    @Get("/verify")
+    public HttpResponse<Map<String, Object>> verifyToken(HttpRequest<?> request) {
+        String username = requireAuth(request);
+        if (username == null) return unauthorized();
+        return ok(Map.of("valid", true, "username", username));
     }
 
-    @Introspected
-    public static class LoginRequest {
-        @NotBlank
-        private String username;
-        @NotBlank
-        private String password;
+    // ─── Helpers ─────────────────────────────────────────────────────────────
 
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+    /** Extract and verify Bearer token from request. Returns username or null. */
+    private String requireAuth(HttpRequest<?> request) {
+        return request.getHeaders().getAuthorization()
+                .map(h -> {
+                    if (!h.startsWith("Bearer ")) return null;
+                    try {
+                        return jwtUtil.getSubject(h.substring(7));
+                    } catch (JwtUtil.JwtException e) {
+                        LOG.warn("Bad token: {}", e.getMessage());
+                        return null;
+                    }
+                })
+                .orElse(null);
     }
 
-    @Introspected
-    public static class UpdatePasswordRequest {
-        @NotBlank
-        private String oldPassword;
-        
-        @NotBlank @Size(min = 6)
-        private String newPassword;
-
-        public String getOldPassword() { return oldPassword; }
-        public void setOldPassword(String oldPassword) { this.oldPassword = oldPassword; }
-        public String getNewPassword() { return newPassword; }
-        public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
+    private static String str(Map<String, Object> body, String key) {
+        Object v = body.get(key);
+        return v != null ? v.toString().trim() : null;
     }
+
+    private static HttpResponse<Map<String, Object>> ok(Map<String, Object> body) {
+        return HttpResponse.ok(body);
+    }
+
+    private static HttpResponse<Map<String, Object>> bad(String msg) {
+        return HttpResponse.badRequest(Map.of("success", false, "error", msg));
+    }
+
+    private static HttpResponse<Map<String, Object>> err(String msg) {
+        return HttpResponse.serverError(Map.of("success", false, "error", msg));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> HttpResponse<T> unauthorized() {
+        return (HttpResponse<T>) HttpResponse.unauthorized()
+                .body(Map.of("success", false, "error", "Unauthorized - please login"));
+    }
+
+    private String classifyN(double v) { return v < 280 ? "Low" : v <= 560 ? "Medium" : "High"; }
+    private String classifyP(double v) { return v < 10 ? "Low" : v <= 25 ? "Medium" : "High"; }
+    private String classifyK(double v) { return v < 110 ? "Low" : v <= 280 ? "Medium" : "High"; }
 }
