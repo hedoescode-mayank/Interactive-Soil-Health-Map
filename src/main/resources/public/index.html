@@ -323,81 +323,152 @@
 <!-- Auth Modal -->
 <div id="authModal" class="modal">
     <div class="modal-content">
-        <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+        <span class="modal-close" onclick="closeAuthModal()">×</span>
+
+        <!-- LOGIN -->
         <div id="loginForm" class="auth-form">
-            <h2>Welcome Back</h2>
+            <h2>Welcome Back 👋</h2>
             <p>Login to access your Soil Health Dashboard</p>
+            <div id="loginMsg" class="auth-msg" style="display:none"></div>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>Username</label>
-                    <input type="text" id="loginUsername" required>
+                    <input type="text" id="loginUsername" placeholder="Enter your username" required autocomplete="username">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="loginPassword" required>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn-auth">Login</button>
+                <button type="submit" class="btn-auth" id="loginBtn">Login</button>
             </form>
-            <p class="auth-switch">Don't have an account? <a onclick="switchToRegister()">Register here</a></p>
-            <div class="admin-login-divider">
-                <span></span><span>or</span><span></span>
-            </div>
+            <p class="auth-switch">Don't have an account? <a onclick="showPanel('registerForm')">Register here</a></p>
+            <p class="auth-switch"><a onclick="showPanel('forgotStep1Form')" style="color:#888;font-size:0.85rem">Forgot password?</a></p>
+            <div class="admin-login-divider"><span></span><span>or</span><span></span></div>
             <p class="auth-switch admin-portal-link">
                 <a href="admin.html" class="admin-link-btn">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     Admin Login
                 </a>
             </p>
         </div>
 
+        <!-- REGISTER -->
         <div id="registerForm" class="auth-form" style="display:none;">
-            <h2>Create Account</h2>
+            <h2>Create Account 🌱</h2>
             <p>Register to get your personalized Soil Health Card</p>
+            <div id="registerMsg" class="auth-msg" style="display:none"></div>
             <form onsubmit="handleRegister(event)">
                 <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="regFullName" required>
+                    <label>Full Name *</label>
+                    <input type="text" id="regFullName" placeholder="Rajesh Kumar" required>
                 </div>
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="regUsername" required>
+                    <label>Username *</label>
+                    <input type="text" id="regUsername" placeholder="rajesh_k" required minlength="3" maxlength="50" pattern="[a-zA-Z0-9_]+" title="Letters, digits and underscores only">
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="regPassword" required minlength="6">
+                    <label>Password * (min 6 chars)</label>
+                    <input type="password" id="regPassword" placeholder="••••••••" required minlength="6" autocomplete="new-password">
                 </div>
                 <div class="form-group">
-                    <label>Postal Code (6 digits)</label>
-                    <input type="text" id="regPostalCode" pattern="[0-9]{6}" required>
+                    <label>Postal Code * (6 digits)</label>
+                    <input type="text" id="regPostalCode" placeholder="110001" pattern="[0-9]{6}" maxlength="6" required>
                 </div>
                 <div class="form-group">
                     <label>Phone Number (Optional)</label>
-                    <input type="tel" id="regPhone" pattern="[0-9]{10}">
+                    <input type="tel" id="regPhone" placeholder="9876543210" pattern="[0-9]{10}" maxlength="10">
                 </div>
-                <button type="submit" class="btn-auth">Register</button>
+                <div class="form-group">
+                    <label>Security Question * <small>(for password reset)</small></label>
+                    <select id="regSecurityQ" required>
+                        <option value="">-- Select a question --</option>
+                        <option>What is the name of your first pet?</option>
+                        <option>What is your mother's maiden name?</option>
+                        <option>What city were you born in?</option>
+                        <option>What is the name of your primary school?</option>
+                        <option>What was your childhood nickname?</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Your Answer *</label>
+                    <input type="text" id="regSecurityA" placeholder="Your answer (case-insensitive)" required>
+                </div>
+                <button type="submit" class="btn-auth" id="registerBtn">Create Account</button>
             </form>
-            <p class="auth-switch">Already have an account? <a onclick="switchToLogin()">Login here</a></p>
+            <p class="auth-switch">Already have an account? <a onclick="showPanel('loginForm')">Login here</a></p>
         </div>
 
-        <div id="changePasswordForm" class="auth-form" style="display:none;">
-            <h2>Update Password</h2>
-            <p>Enter your current and new password below</p>
-            <form onsubmit="handleUpdatePassword(event)">
+        <!-- FORGOT — STEP 1: Enter username -->
+        <div id="forgotStep1Form" class="auth-form" style="display:none;">
+            <h2>Reset Password 🔑</h2>
+            <p>Enter your username to find your account</p>
+            <div id="forgot1Msg" class="auth-msg" style="display:none"></div>
+            <form onsubmit="handleForgotStep1(event)">
                 <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="oldPassword" required>
+                    <label>Username</label>
+                    <input type="text" id="forgotUsername" placeholder="Your username" required>
                 </div>
+                <button type="submit" class="btn-auth" id="forgot1Btn">Find Account</button>
+            </form>
+            <p class="auth-switch"><a onclick="showPanel('loginForm')">← Back to Login</a></p>
+        </div>
+
+        <!-- FORGOT — STEP 2: Answer security question -->
+        <div id="forgotStep2Form" class="auth-form" style="display:none;">
+            <h2>Verify Identity 🛡️</h2>
+            <p>Answer your security question to continue</p>
+            <div id="forgot2Msg" class="auth-msg" style="display:none"></div>
+            <div class="form-group">
+                <label>Security Question</label>
+                <div id="securityQuestionText" class="security-q-display"></div>
+            </div>
+            <form onsubmit="handleForgotStep2(event)">
                 <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="newPassword" required minlength="6">
+                    <label>Your Answer</label>
+                    <input type="text" id="forgotAnswer" placeholder="Your answer" required>
+                </div>
+                <button type="submit" class="btn-auth" id="forgot2Btn">Verify Answer</button>
+            </form>
+            <p class="auth-switch"><a onclick="showPanel('forgotStep1Form')">← Back</a></p>
+        </div>
+
+        <!-- FORGOT — STEP 3: Set new password -->
+        <div id="forgotStep3Form" class="auth-form" style="display:none;">
+            <h2>New Password ✅</h2>
+            <p>Choose a strong new password</p>
+            <div id="forgot3Msg" class="auth-msg" style="display:none"></div>
+            <form onsubmit="handleForgotStep3(event)">
+                <div class="form-group">
+                    <label>New Password (min 6 chars)</label>
+                    <input type="password" id="forgotNewPass" placeholder="••••••••" required minlength="6" autocomplete="new-password">
                 </div>
                 <div class="form-group">
                     <label>Confirm New Password</label>
-                    <input type="password" id="confirmNewPassword" required minlength="6">
+                    <input type="password" id="forgotConfirmPass" placeholder="••••••••" required minlength="6" autocomplete="new-password">
                 </div>
-                <button type="submit" class="btn-auth">Update Password</button>
+                <button type="submit" class="btn-auth" id="forgot3Btn">Reset Password</button>
+            </form>
+        </div>
+
+        <!-- CHANGE PASSWORD (logged in) -->
+        <div id="changePasswordForm" class="auth-form" style="display:none;">
+            <h2>Change Password 🔒</h2>
+            <p>Enter your current and new password below</p>
+            <div id="changePwMsg" class="auth-msg" style="display:none"></div>
+            <form onsubmit="handleUpdatePassword(event)">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="oldPassword" required autocomplete="current-password">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" required minlength="6" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmNewPassword" required minlength="6" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-auth" id="changePwBtn">Update Password</button>
             </form>
             <p class="auth-switch"><a onclick="closeAuthModal()">Cancel</a></p>
         </div>
@@ -503,173 +574,273 @@
     drawDonutChart('phosphorusChart', [14, 36, 50], chartColors);
     drawDonutChart('potassiumChart', [31, 59, 10], chartColors);
 
-    // Auth Modal Functions
-    function showLogin() {
+    // ──────────────────────────────────────────────────────────────────
+    // AUTH PANEL HELPERS
+    // ──────────────────────────────────────────────────────────────────
+    const ALL_PANELS = ['loginForm','registerForm','changePasswordForm',
+                        'forgotStep1Form','forgotStep2Form','forgotStep3Form'];
+
+    function showPanel(id) {
         document.getElementById('authModal').style.display = 'flex';
-        document.getElementById('loginForm').style.display = 'block';
-        document.getElementById('registerForm').style.display = 'none';
-        document.getElementById('changePasswordForm').style.display = 'none';
+        ALL_PANELS.forEach(p => document.getElementById(p).style.display = 'none');
+        document.getElementById(id).style.display = 'block';
     }
 
-    function showRegister() {
-        document.getElementById('authModal').style.display = 'flex';
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'block';
-        document.getElementById('changePasswordForm').style.display = 'none';
+    function showLogin()    { showPanel('loginForm'); }
+    function showRegister() { showPanel('registerForm'); }
+    function showChangePassword() { showPanel('changePasswordForm'); }
+    function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+    // legacy compat
+    function switchToRegister() { showPanel('registerForm'); }
+    function switchToLogin()    { showPanel('loginForm'); }
+
+    function showMsg(msgId, text, isError) {
+        const el = document.getElementById(msgId);
+        el.style.display = 'block';
+        el.textContent = text;
+        el.className = 'auth-msg ' + (isError ? 'auth-msg-error' : 'auth-msg-success');
     }
 
-    function closeAuthModal() {
-        document.getElementById('authModal').style.display = 'none';
+    function setLoading(btnId, loading, label) {
+        const btn = document.getElementById(btnId);
+        btn.disabled = loading;
+        btn.textContent = loading ? 'Please wait…' : label;
     }
 
-    function switchToRegister() {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'block';
-        document.getElementById('changePasswordForm').style.display = 'none';
-    }
-
-    function switchToLogin() {
-        document.getElementById('loginForm').style.display = 'block';
-        document.getElementById('registerForm').style.display = 'none';
-        document.getElementById('changePasswordForm').style.display = 'none';
-    }
-
-    function showChangePassword() {
-        document.getElementById('authModal').style.display = 'flex';
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'none';
-        document.getElementById('changePasswordForm').style.display = 'block';
-    }
-
-    // Handle Update Password
-    async function handleUpdatePassword(e) {
-        e.preventDefault();
-        const oldPassword = document.getElementById('oldPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-        const submitBtn = e.target.querySelector('button');
-
-        if (newPassword !== confirmNewPassword) {
-            alert('New passwords do not match!');
-            return;
-        }
-
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('You must be logged in to change your password.');
-            showLogin();
-            return;
-        }
-
-        try {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Updating...';
-            
-            const response = await fetch('/api/auth/update-password', {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ oldPassword, newPassword })
-            });
-
-            const data = await response.json();
-            if (response.ok && data.success) {
-                alert('Password updated successfully!');
-                closeAuthModal();
-            } else {
-                alert(data.error || 'Failed to update password');
-            }
-        } catch (error) {
-            console.error('Update password error:', error);
-            alert('An error occurred. Please try again.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Update Password';
-        }
-    }
-
-    // Handle Login
+    // ──────────────────────────────────────────────────────────────────
+    // LOGIN
+    // ──────────────────────────────────────────────────────────────────
     async function handleLogin(e) {
         e.preventDefault();
-        const username = document.getElementById('loginUsername').value;
+        const username = document.getElementById('loginUsername').value.trim();
         const password = document.getElementById('loginPassword').value;
+        document.getElementById('loginMsg').style.display = 'none';
+        setLoading('loginBtn', true, 'Login');
 
         try {
-            const response = await fetch('/api/auth/login', {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
             });
+            const data = await res.json();
 
-            const data = await response.json();
             if (data.success) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('farmer', JSON.stringify(data.farmer));
-                alert('Login successful!');
                 closeAuthModal();
                 updateAuthUI();
                 window.location.href = '/dashboard';
             } else {
-                alert(data.error || 'Login failed');
+                showMsg('loginMsg', data.error || 'Login failed. Check your credentials.', true);
             }
-        } catch (error) {
-            console.error('Login error:', error);
-            alert('Login failed. Please try again.');
+        } catch (err) {
+            showMsg('loginMsg', 'Network error — is the server running?', true);
+        } finally {
+            setLoading('loginBtn', false, 'Login');
         }
     }
 
-    // Handle Register
+    // ──────────────────────────────────────────────────────────────────
+    // REGISTER
+    // ──────────────────────────────────────────────────────────────────
     async function handleRegister(e) {
         e.preventDefault();
-        const fullName = document.getElementById('regFullName').value.trim();
-        const username = document.getElementById('regUsername').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const postalCode = document.getElementById('regPostalCode').value.trim();
-        const rawPhone = document.getElementById('regPhone').value.trim();
-        const phone = rawPhone.length === 10 ? rawPhone : null;
+        const fullName        = document.getElementById('regFullName').value.trim();
+        const username        = document.getElementById('regUsername').value.trim();
+        const password        = document.getElementById('regPassword').value;
+        const postalCode      = document.getElementById('regPostalCode').value.trim();
+        const rawPhone        = document.getElementById('regPhone').value.trim();
+        const phone           = rawPhone.length === 10 ? rawPhone : null;
+        const securityQuestion = document.getElementById('regSecurityQ').value;
+        const securityAnswer  = document.getElementById('regSecurityA').value.trim();
+        document.getElementById('registerMsg').style.display = 'none';
 
+        if (!securityQuestion) { showMsg('registerMsg', 'Please select a security question', true); return; }
+        if (!securityAnswer)   { showMsg('registerMsg', 'Please provide an answer to the security question', true); return; }
+
+        setLoading('registerBtn', true, 'Create Account');
         try {
-            const response = await fetch('/api/auth/register', {
+            const res = await fetch('/api/auth/register', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, postalCode, fullName, phone })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password, fullName, phone, postalCode, securityQuestion, securityAnswer})
             });
+            const data = await res.json();
 
-            const data = await response.json();
             if (data.success) {
-                alert('Registration successful! Please login.');
-                switchToLogin();
+                showMsg('registerMsg', '✅ Account created! Redirecting to login…', false);
+                setTimeout(() => showPanel('loginForm'), 1800);
             } else {
-                alert(data.error || 'Registration failed');
+                showMsg('registerMsg', data.error || 'Registration failed', true);
             }
-        } catch (error) {
-            console.error('Registration error:', error);
-            alert('Registration failed. Please try again.');
+        } catch (err) {
+            showMsg('registerMsg', 'Network error — is the server running?', true);
+        } finally {
+            setLoading('registerBtn', false, 'Create Account');
         }
     }
 
+    // ──────────────────────────────────────────────────────────────────
+    // FORGOT PASSWORD — 3 steps
+    // ──────────────────────────────────────────────────────────────────
+    let _forgotUsername = '';
+    let _resetToken = '';
+
+    async function handleForgotStep1(e) {
+        e.preventDefault();
+        _forgotUsername = document.getElementById('forgotUsername').value.trim();
+        document.getElementById('forgot1Msg').style.display = 'none';
+        setLoading('forgot1Btn', true, 'Find Account');
+        try {
+            const res = await fetch('/api/auth/forgot/question', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username: _forgotUsername})
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('securityQuestionText').textContent = data.question;
+                showPanel('forgotStep2Form');
+            } else {
+                showMsg('forgot1Msg', data.error || 'Account not found', true);
+            }
+        } catch (err) {
+            showMsg('forgot1Msg', 'Network error', true);
+        } finally {
+            setLoading('forgot1Btn', false, 'Find Account');
+        }
+    }
+
+    async function handleForgotStep2(e) {
+        e.preventDefault();
+        const answer = document.getElementById('forgotAnswer').value.trim();
+        document.getElementById('forgot2Msg').style.display = 'none';
+        setLoading('forgot2Btn', true, 'Verify Answer');
+        try {
+            const res = await fetch('/api/auth/forgot/verify', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username: _forgotUsername, answer})
+            });
+            const data = await res.json();
+            if (data.success) {
+                _resetToken = data.resetToken;
+                showPanel('forgotStep3Form');
+            } else {
+                showMsg('forgot2Msg', data.error || 'Incorrect answer', true);
+            }
+        } catch (err) {
+            showMsg('forgot2Msg', 'Network error', true);
+        } finally {
+            setLoading('forgot2Btn', false, 'Verify Answer');
+        }
+    }
+
+    async function handleForgotStep3(e) {
+        e.preventDefault();
+        const newPassword     = document.getElementById('forgotNewPass').value;
+        const confirmPassword = document.getElementById('forgotConfirmPass').value;
+        document.getElementById('forgot3Msg').style.display = 'none';
+
+        if (newPassword !== confirmPassword) {
+            showMsg('forgot3Msg', 'Passwords do not match', true);
+            return;
+        }
+        if (newPassword.length < 6) {
+            showMsg('forgot3Msg', 'Password must be at least 6 characters', true);
+            return;
+        }
+        setLoading('forgot3Btn', true, 'Reset Password');
+        try {
+            const res = await fetch('/api/auth/forgot/reset', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username: _forgotUsername, resetToken: _resetToken, newPassword})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showMsg('forgot3Msg', '✅ Password reset! Redirecting to login…', false);
+                setTimeout(() => showPanel('loginForm'), 2000);
+            } else {
+                showMsg('forgot3Msg', data.error || 'Reset failed', true);
+            }
+        } catch (err) {
+            showMsg('forgot3Msg', 'Network error', true);
+        } finally {
+            setLoading('forgot3Btn', false, 'Reset Password');
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // CHANGE PASSWORD (logged in)
+    // ──────────────────────────────────────────────────────────────────
+    async function handleUpdatePassword(e) {
+        e.preventDefault();
+        const oldPassword     = document.getElementById('oldPassword').value;
+        const newPassword     = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmNewPassword').value;
+        document.getElementById('changePwMsg').style.display = 'none';
+
+        if (newPassword !== confirmPassword) { showMsg('changePwMsg', 'New passwords do not match', true); return; }
+        if (newPassword.length < 6)          { showMsg('changePwMsg', 'Password must be at least 6 chars', true); return; }
+
+        const token = localStorage.getItem('token');
+        if (!token) { showPanel('loginForm'); return; }
+
+        setLoading('changePwBtn', true, 'Update Password');
+        try {
+            const res = await fetch('/api/auth/change-password', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+                body: JSON.stringify({oldPassword, newPassword})
+            });
+            const data = await res.json();
+            if (data.success) {
+                showMsg('changePwMsg', '✅ Password updated successfully!', false);
+                setTimeout(closeAuthModal, 1800);
+            } else {
+                showMsg('changePwMsg', data.error || 'Failed to update password', true);
+            }
+        } catch (err) {
+            showMsg('changePwMsg', 'Network error', true);
+        } finally {
+            setLoading('changePwBtn', false, 'Update Password');
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // AUTH UI STATE
+    // ──────────────────────────────────────────────────────────────────
     function updateAuthUI() {
         const token = localStorage.getItem('token');
         const authButtons = document.querySelector('.auth-buttons');
         const themeBtn = document.getElementById('themeToggle').outerHTML;
-        const menuBtn = document.getElementById('menuToggle').outerHTML;
-        
+        const menuBtn  = document.getElementById('menuToggle').outerHTML;
+
         if (token) {
+            const farmer = JSON.parse(localStorage.getItem('farmer') || '{}');
             authButtons.innerHTML = `
                 ${themeBtn}
+                <span class="user-greeting">👤 ${farmer.fullName || farmer.username || 'Farmer'}</span>
                 <button onclick="showChangePassword()" class="btn-outline">Change Password</button>
                 <button onclick="handleLogout()" class="btn-primary">Logout</button>
                 ${menuBtn}
             `;
-            // Re-attach theme toggle listener since innerHTML was reset
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            document.getElementById('menuToggle').addEventListener('click', () => {
-                document.querySelector('.nav').classList.toggle('active');
-                document.getElementById('menuToggle').textContent = document.querySelector('.nav').classList.contains('active') ? '✕' : '☰';
-            });
+        } else {
+            authButtons.innerHTML = `
+                ${themeBtn}
+                <button onclick="showLogin()" class="btn-outline">Login</button>
+                <button onclick="showRegister()" class="btn-primary">Register</button>
+                ${menuBtn}
+            `;
         }
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.querySelector('.nav').classList.toggle('active');
+            document.getElementById('menuToggle').textContent =
+                document.querySelector('.nav').classList.contains('active') ? '✕' : '☰';
+        });
     }
 
     function handleLogout() {
@@ -678,12 +849,9 @@
         window.location.href = '/';
     }
 
-    // Close modal on outside click
+    // Close modal on backdrop click
     window.onclick = function(event) {
-        const modal = document.getElementById('authModal');
-        if (event.target === modal) {
-            closeAuthModal();
-        }
+        if (event.target === document.getElementById('authModal')) closeAuthModal();
     }
 
     // Simple AOS-like animation

@@ -28,30 +28,19 @@ micronaut:
         signatures:
           secret:
             generator:
-              secret: ${JWT_SECRET:changeMeInProductionToAVeryLongAndSecureRandomStringWithAtLeast256Bits}
+              secret: ${JWT_SECRET:ISHMSuperSecretKeyForJWT2025Production!@#$}
               jws-algorithm: HS256
-        generator:
-          access-token:
-            expiration: ${JWT_EXPIRATION:86400}
     intercept-url-map:
       - pattern: /api/admin/**
         access:
           - hasRole('ROLE_ADMIN')
-      - pattern: /api/auth/me
-        access:
-          - isAuthenticated()
-      - pattern: /api/auth/update-password
-        access:
-          - isAuthenticated()
-      - pattern: /api/auth/verify
-        access:
-          - isAuthenticated()
-      - pattern: /api/recommendations/save
-        access:
-          - isAuthenticated()
       - pattern: /**
         access:
           - isAnonymous()
+
+jwt:
+  custom:
+    secret: ${JWT_SECRET:ISHMSuperSecretKeyForJWT2025Production!@#$}
   router:
     static-resources:
       default:
